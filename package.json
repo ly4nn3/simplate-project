@@ -1,0 +1,35 @@
+{
+  "name": "simplate-project",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "index.js",
+  "devDependencies": {
+    "@eslint/js": "^9.23.0",
+    "eslint": "^9.23.0",
+    "eslint-config-prettier": "^10.1.1",
+    "globals": "^16.0.0",
+    "prettier": "^3.5.3",
+    "vite": "^6.2.4"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint \"src/**/*.js\"",
+    "format": "prettier --write \"src/**/*.{js,html,css}\"",
+    "fix": "npm run format && npm run lint -- --fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ly4nn3/simplate-project.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ly4nn3/simplate-project/issues"
+  },
+  "homepage": "https://github.com/ly4nn3/simplate-project#readme",
+  "description": "A vanilla JavaScript recipe website featuring responsive design and modern ES modules"
+}
