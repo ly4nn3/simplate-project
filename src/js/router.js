@@ -20,29 +20,29 @@ export const router = async (path) => {
 
     // View rendering switch
     switch (view) {
-        case "Kitchen":
-            app.innerHTML = await renderKitchen();
-            break;
-        case "OvenRecipes":
-            app.innerHTML = await renderOvenRecipes();
-            break;
-        case "StoveRecipes":
-            app.innerHTML = await renderStoveRecipes();
-            break;
-        case "MicrowaveRecipes":
-            app.innerHTML = await renderMicrowaveRecipes();
-            break;
-        case "ToasterRecipes":
-            app.innerHTML = await renderToasterRecipes();
-            break;
-        case "Book":
-            app.innerHTML = await renderBook();
-            break;
-        case "About":
-            app.innerHTML = await renderAbout();
-            break;
-        default:
-            app.innerHTML = await renderKitchen();
+    case "Kitchen":
+        app.innerHTML = await renderKitchen();
+        break;
+    case "OvenRecipes":
+        app.innerHTML = await renderOvenRecipes();
+        break;
+    case "StoveRecipes":
+        app.innerHTML = await renderStoveRecipes();
+        break;
+    case "MicrowaveRecipes":
+        app.innerHTML = await renderMicrowaveRecipes();
+        break;
+    case "ToasterRecipes":
+        app.innerHTML = await renderToasterRecipes();
+        break;
+    case "Book":
+        app.innerHTML = await renderBook();
+        break;
+    case "About":
+        app.innerHTML = await renderAbout();
+        break;
+    default:
+        app.innerHTML = await renderKitchen();
     }
 };
 
