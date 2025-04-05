@@ -83,13 +83,13 @@ const renderRecipes = async (applianceType) => {
             <button data-navigate="/" class="back-button">Back to Kitchen</button>
             
             <div class="wip-container">
-                <h1>${capitalizedType} Recipes</h1>
+                <h2>${capitalizedType} Recipes</h2>
                 <div class="wip-message">
                     <p>🚧 Work in Progress 🚧</p>
                     <p>Coming soon: Delicious ${capitalizedType} recipes!</p>
                     <!-- Add placeholder for future gif -->
                     <div class="gif-placeholder">
-                        <img src="../assets/images/work-in-progress.gif" alt="Work in Progress GIF" width="200" height="200">
+                        <img src="/assets/images/work-in-progress.gif" alt="Work in Progress GIF" width="200" height="200">
                     </div>
                 </div>
             </div>
@@ -101,7 +101,18 @@ const renderRecipes = async (applianceType) => {
 const renderBook = async () => {
     return `
         <div class="book">
-            <h1>Today's Book Recommendation</h1>
+            <button data-navigate="/" class="back-button">Back to Kitchen</button>
+            
+            <div class="wip-container">
+                <h2>Today's Book Recommendation</h2>
+                <div class="wip-message">
+                    <p>🚧 Work in Progress 🚧</p>
+                    <p>Coming soon: Curated cookbook recommendations!</p>
+                    <div class="gif-placeholder">
+                        <img src="/assets/images/work-in-progress.gif" alt="Work in Progress GIF" width="200" height="200">
+                    </div>
+                </div>
+            </div>
         </div>
     `;
 };

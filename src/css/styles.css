@@ -5,18 +5,15 @@
     --text-color: #eeece3;
     --text2-color: #dad5c6;
     --font-h1: "Zen Loop", cursive;
-}
-
-h1 {
-    font-family: var(--font-h1);
-    display: none;
+    --font-h2: "Fragment Mono", monospace;
+    --font-body: "Work Sans", sans-serif;
 }
 
 body {
     margin: 0;
     padding: 0;
     background: var(--primary-color);
-    font-family: "Work Sans", sans-serif;
+    font-family: var(--font-body);
     color: var(--text-color);
 }
 
@@ -25,7 +22,16 @@ header {
     padding: 1rem;
 }
 
-.recipes {
+h1 {
+    font-family: var(--font-h1);
+    display: none;
+}
+
+h2 {
+    font-family: var(--font-h2)
+}
+.recipes,
+.book {
     padding: 20px;
     text-align: center;
 }
@@ -34,7 +40,6 @@ header {
     padding: 10px 20px;
     margin-bottom: 20px;
     cursor: pointer;
-    /* Add your button styles */
 }
 
 .wip-container {
