@@ -1,109 +1,98 @@
+import { initializeKitchen } from "./kitchen.js";
+
 // Router function for different views
 export const router = async (path) => {
+    const basePath = path.split("?")[0];
+    // Parse appliance type from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const applianceType = urlParams.get("type");
     const routes = {
         "/": "Kitchen", // Kitchen view home page
-        // Recipe appliance routes
-        "/oven-recipes": "OvenRecipes",
-        "/stove-recipes": "StoveRecipes",
-        "/microwave-recipes": "MicrowaveRecipes",
-        "/toaster-recipes": "ToasterRecipes",
+        // Recipe routing
+        "/recipes": "Recipes",
         // Other routes
         "/book": "Book", // Book recommendation page
         "/about": "About", // About page
     };
 
     // Default to "/" if path not found
-    const view = routes[path] || routes["/"];
+    const view = routes[basePath] || routes["/"];
 
     // Reference app container
     const app = document.getElementById("app");
 
     // View rendering switch
-    switch (view) {
-    case "Kitchen":
-        app.innerHTML = await renderKitchen();
-        break;
-    case "OvenRecipes":
-        app.innerHTML = await renderOvenRecipes();
-        break;
-    case "StoveRecipes":
-        app.innerHTML = await renderStoveRecipes();
-        break;
-    case "MicrowaveRecipes":
-        app.innerHTML = await renderMicrowaveRecipes();
-        break;
-    case "ToasterRecipes":
-        app.innerHTML = await renderToasterRecipes();
-        break;
-    case "Book":
-        app.innerHTML = await renderBook();
-        break;
-    case "About":
-        app.innerHTML = await renderAbout();
-        break;
-    default:
-        app.innerHTML = await renderKitchen();
+    try {
+        switch (view) {
+        case "Kitchen":
+            app.innerHTML = await renderKitchen();
+            // Have to initialize kitchen interactions after rendering
+            initializeKitchen();
+            break;
+        case "Recipes":
+            app.innerHTML = await renderRecipes(applianceType);
+            break;
+        case "Book":
+            app.innerHTML = await renderBook();
+            break;
+        case "About":
+            app.innerHTML = await renderAbout();
+            break;
+        default:
+            app.innerHTML = await renderKitchen();
+            initializeKitchen();
+        }
+    } catch (error) {
+        alert("Routing error:", error);
     }
 };
 
-// View rendering functions
-// Kitchen view
 const renderKitchen = async () => {
     return `
         <div class="kitchen">
-            <h1>The Simplate Kitchen</h1>
-
             <div class="kitchen-layout">
-            <!-- Oven, Stove, Microwave, Toaster -->
-                <div class="oven" data-navigate="/oven-recipes">
-                    <h2>Oven Recipes</h2>
+                <!-- Base kitchen -->
+                <div class="base-kitchen"></div>
+                
+                <!-- Interactive elements -->
+                <div class="interactive-zones">
+                    <div class="oven-active" data-navigate="/recipes?type=oven"></div>
+                    <div class="stove-active" data-navigate="/recipes?type=stove"></div>
+                    <div class="microwave-active" data-navigate="/recipes?type=microwave"></div>
+                    <div class="ricecooker-active" data-navigate="/recipes?type=ricecooker"></div>
+                    <div class="board-active" data-navigate="/recipes?type=board"></div>
+                    <div class="book-aa" data-navigate="/book"></div>
                 </div>
 
-                <div class="stove" data-navigate="/stove-recipes">
-                    <h2>Stove Recipes</h2>
-                </div>
-
-                <div class="microwave" data-navigate="/microwave-recipes">
-                    <h2>Microwave Recipes</h2>
-                </div>
-
-                <div class="toaster" data-navigate="/toaster-recipes">
-                    <h2>Toaster Recipes</h2>
-                </div>
+                <!-- + more interactive elements -->
             </div>
         </div>
     `;
 };
 
 // Recipe view
-const renderOvenRecipes = async () => {
-    return `
-        <div class="recipes oven-recipes">
-            <h1>Oven Recipes</h1>
-        </div>
-    `;
-};
+const renderRecipes = async (applianceType) => {
+    // Capitalize first letter only
+    const capitalizedType = applianceType
+        ? applianceType.charAt(0).toUpperCase() +
+          applianceType.slice(1).toLowerCase()
+        : "";
 
-const renderStoveRecipes = async () => {
     return `
-        <div class="recipes stove-recipes">
-            <h1>Stove Recipes</h1>
-        </div>
-    `;
-};
-
-const renderMicrowaveRecipes = async () => {
-    return `
-        <div class="recipes microwave-recipes">
-            <h1>Microwave Recipes</h1>
-        </div>
-    `;
-};
-
-const renderToasterRecipes = async () => {
-    return `
-        <div class="recipes toaster-recipes">
-            <h1>Toaster Recipes</h1>
+        <div class="recipes">
+            <button data-navigate="/" class="back-button">Back to Kitchen</button>
+            
+            <div class="wip-container">
+                <h1>${capitalizedType} Recipes</h1>
+                <div class="wip-message">
+                    <p>🚧 Work in Progress 🚧</p>
+                    <p>Coming soon: Delicious ${capitalizedType} recipes!</p>
+                    <!-- Add placeholder for future gif -->
+                    <div class="gif-placeholder">
+                        <img src="../assets/images/work-in-progress.gif" alt="Work in Progress GIF" width="200" height="200">
+                    </div>
+                </div>
+            </div>
         </div>
     `;
 };

@@ -1,0 +1,55 @@
+/*
+   ---------------------------
+   created with Free texture packer v0.6.7
+   http://free-tex-packer.com
+   ---------------------------
+*/
+.base-kitchen {
+    display: inline-block;
+    overflow: hidden;
+    background: url(kitchen-interactive.png) no-repeat -2px -2px;
+    width: 880px;
+    height: 720px;
+}
+.board-active {
+    display: inline-block;
+    overflow: hidden;
+    background: url(kitchen-interactive.png) no-repeat -2px -726px;
+    width: 880px;
+    height: 720px;
+}
+.book-aa {
+    display: inline-block;
+    overflow: hidden;
+    background: url(kitchen-interactive.png) no-repeat -2px -1450px;
+    width: 880px;
+    height: 720px;
+}
+.microwave-active {
+    display: inline-block;
+    overflow: hidden;
+    background: url(kitchen-interactive.png) no-repeat -2px -2174px;
+    width: 880px;
+    height: 720px;
+}
+.oven-active {
+    display: inline-block;
+    overflow: hidden;
+    background: url(kitchen-interactive.png) no-repeat -2px -2898px;
+    width: 880px;
+    height: 720px;
+}
+.ricecooker-active {
+    display: inline-block;
+    overflow: hidden;
+    background: url(kitchen-interactive.png) no-repeat -2px -3622px;
+    width: 880px;
+    height: 720px;
+}
+.stove-active {
+    display: inline-block;
+    overflow: hidden;
+    background: url(kitchen-interactive.png) no-repeat -2px -4346px;
+    width: 880px;
+    height: 720px;
+}

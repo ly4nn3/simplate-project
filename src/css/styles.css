@@ -1,0 +1,63 @@
+@import url("https://fonts.googleapis.com/css2?family=Fragment+Mono:ital@0;1&family=Work+Sans:ital,wght@0,100..900;1,100..900&family=Zen+Loop:ital@0;1&display=swap");
+:root {
+    --primary-color: #232e3f;
+    --accent-color: #cf9421;
+    --text-color: #eeece3;
+    --text2-color: #dad5c6;
+    --font-h1: "Zen Loop", cursive;
+}
+
+h1 {
+    font-family: var(--font-h1);
+    display: none;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background: var(--primary-color);
+    font-family: "Work Sans", sans-serif;
+    color: var(--text-color);
+}
+
+header {
+    margin: 1rem;
+    padding: 1rem;
+}
+
+.recipes {
+    padding: 20px;
+    text-align: center;
+}
+
+.back-button {
+    padding: 10px 20px;
+    margin-bottom: 20px;
+    cursor: pointer;
+    /* Add your button styles */
+}
+
+.wip-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 40px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.wip-message {
+    margin-top: 30px;
+    font-size: 1.2em;
+}
+
+.wip-message p {
+    margin: 10px 0;
+}
+
+.gif-placeholder {
+    width: 300px;
+    height: 200px;
+    margin: 30px auto;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+}

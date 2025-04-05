@@ -1,23 +1,25 @@
 import { router } from "./router.js";
+import { initializeKitchen } from "./kitchen.js";
 
-// Initialize router on load
+const handleNavigation = (path) => {
+    history.pushState(null, null, path);
+    router(path);
+};
+
 window.addEventListener("DOMContentLoaded", () => {
-    router(window.location.pathname);
+    router(window.location.pathname + window.location.search);
+    initializeKitchen();
+
+    document.addEventListener("click", (e) => {
+        const target = e.target.closest("[data-navigate]");
+        if (target) {
+            e.preventDefault();
+            const path = target.dataset.navigate;
+            handleNavigation(path);
+        }
+    });
 });
 
-// Back and forward on browser
 window.addEventListener("popstate", () => {
-    router(window.location.pathname);
-});
-
-// For navigation within views
-// To be modified
-document.addEventListener("click", (e) => {
-    const navigateElement = e.target.closest("[data-navigate]");
-
-    if (navigateElement) {
-        const path = navigateElement.dataset.navigate;
-        history.pushState(null, null, path);
-        router(path);
-    }
+    router(window.location.pathname + window.location.search);
 });

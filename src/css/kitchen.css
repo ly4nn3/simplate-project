@@ -1,0 +1,208 @@
+.kitchen-layout {
+    position: relative;
+    width: 880px;
+    height: 720px;
+    margin: 0 auto;
+}
+
+.base-kitchen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 880px;
+    height: 720px;
+    z-index: 1;
+}
+
+/* Interactive elements */
+.oven-active,
+.stove-active,
+.microwave-active,
+.ricecooker-active,
+.board-active,
+.book-aa {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 880px;
+    height: 720px;
+    cursor: pointer;
+    z-index: 2;
+}
+
+/* All except book-aa start invisible */
+.oven-active,
+.stove-active,
+.microwave-active,
+.ricecooker-active,
+.board-active {
+    opacity: 0;
+    transition: all 0.5s ease-out;
+}
+
+/* Show on hover */
+.oven-active:hover,
+.stove-active:hover,
+.microwave-active:hover,
+.ricecooker-active:hover,
+.board-active:hover {
+    opacity: 1;
+}
+
+/* ------------------- */
+/* START OF Clip Paths */
+/* Book is always visible */
+.book-aa {
+    opacity: 1;
+    clip-path: polygon(53% 60%, 60% 60%, 60% 70%, 53% 70%);
+}
+
+.board-active {
+    clip-path: ellipse(6.3% 4.5% at 46.4% 67.9%);
+}
+
+.oven-active {
+    clip-path: ellipse(8% 9% at 20% 63%);
+}
+
+.stove-active {
+    clip-path: ellipse(10% 8% at 26% 48%);
+}
+
+.ricecooker-active {
+    clip-path: ellipse(4.5% 5% at 74.7% 42.5%);
+}
+
+.microwave-active {
+    clip-path: ellipse(7.5% 7% at 86% 49%);
+}
+/* END OF Clip Paths */
+/* ----------------- */
+
+/* -------------- */
+/* START OF Sparkle styles */
+.sparkle-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 20;
+}
+
+.sparkle {
+    position: absolute;
+    pointer-events: none;
+    font-size: 16px;
+    opacity: 0;
+    transition: all 0.5s ease-out;
+    filter: drop-shadow(0 0 5px rgba(255, 223, 0, 0.8)) brightness(1.2);
+    z-index: 21;
+}
+
+.sparkle-container.show-sparkles .sparkle {
+    opacity: 1;
+    animation: gentleFloat 2s ease-in-out infinite;
+}
+
+/* Sparkle positions by element */
+/* Oven */
+.sparkle-oven-active:nth-child(1) {
+    left: 14%;
+    top: 57%;
+}
+.sparkle-oven-active:nth-child(2) {
+    left: 26%;
+    top: 57%;
+}
+.sparkle-oven-active:nth-child(3) {
+    left: 20%;
+    top: 69%;
+}
+
+/* Stove */
+.sparkle-stove-active:nth-child(1) {
+    left: 25%;
+    top: 40%;
+}
+.sparkle-stove-active:nth-child(2) {
+    left: 19%;
+    top: 50%;
+}
+.sparkle-stove-active:nth-child(3) {
+    left: 34%;
+    top: 50%;
+}
+
+/* Microwave */
+.sparkle-microwave-active:nth-child(1) {
+    left: 78%;
+    top: 43.5%;
+}
+.sparkle-microwave-active:nth-child(2) {
+    left: 91%;
+    top: 46.5%;
+}
+.sparkle-microwave-active:nth-child(3) {
+    left: 86%;
+    top: 54.5%;
+}
+
+/* Rice cooker */
+.sparkle-ricecooker-active:nth-child(1) {
+    left: 70%;
+    top: 44%;
+}
+.sparkle-ricecooker-active:nth-child(2) {
+    left: 77%;
+    top: 38%;
+}
+.sparkle-ricecooker-active:nth-child(3) {
+    display: none;
+}
+
+/* Cutting board */
+.sparkle-board-active:nth-child(1) {
+    left: 39%;
+    top: 68%;
+}
+.sparkle-board-active:nth-child(2) {
+    left: 49%;
+    top: 69%;
+}
+.sparkle-board-active:nth-child(3) {
+    left: 46%;
+    top: 61%;
+}
+
+/* Book */
+.sparkle-book-aa:nth-child(1) {
+    left: 51.5%;
+    top: 63%;
+}
+.sparkle-book-aa:nth-child(2) {
+    left: 59%;
+    top: 65%;
+}
+.sparkle-book-aa:nth-child(3) {
+    display: none;
+}
+
+@keyframes gentleFloat {
+    0% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-3px);
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
+
+[data-navigate].hover-effect {
+    z-index: 5;
+}
+/* END OF Sparkle styles */
+/* -------------- */
