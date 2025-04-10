@@ -55,6 +55,11 @@ export function categorizeEquipment(equipmentList) {
 }
 
 export function getRequiredAppliances(recipe) {
+    console.log('Processing recipe:', {
+        title: recipe.title,
+        hasInstructions: !!recipe.analyzedInstructions?.length
+    });
+
     if (!recipe) return new Set();
 
     const requiredAppliances = new Set();
@@ -62,22 +67,29 @@ export function getRequiredAppliances(recipe) {
     // Check equipment in 'analyzed instructions'
     if (recipe.analyzedInstructions?.length > 0) {
         recipe.analyzedInstructions.forEach((instruction) => {
+            console.log('Instruction steps:', instruction.steps?.length);
+            
             instruction.steps?.forEach((step) => {
+                console.log('Step equipment:', step.equipment);
+                console.log('Step text:', step.step);
+
                 // Process equipment
                 step.equipment?.forEach((equipment) => {
                     const equipmentName = equipment.name.toLowerCase();
+                    console.log('Checking equipment:', equipmentName);
 
-                    // Check equipment from my categories
+                    // Check equipment from categories
                     for (const [appliance, data] of Object.entries(
                         equipmentCategories.hasAsset
                     )) {
                         if (data.equipment.includes(equipmentName)) {
+                            console.log(`Found appliance match: ${appliance}`);
                             requiredAppliances.add(appliance);
                         }
                     }
                 });
 
-                // Check 'step' text for cooking indicators
+                // Check step text
                 const stepText = step.step.toLowerCase();
                 for (const [appliance, data] of Object.entries(
                     equipmentCategories.hasAsset
@@ -87,6 +99,7 @@ export function getRequiredAppliances(recipe) {
                             stepText.includes(indicator)
                         )
                     ) {
+                        console.log(`Found indicator match: ${appliance}`);
                         requiredAppliances.add(appliance);
                     }
                 }
@@ -94,5 +107,6 @@ export function getRequiredAppliances(recipe) {
         });
     }
 
+    console.log('Required appliances for recipe:', Array.from(requiredAppliances));
     return requiredAppliances;
 }
