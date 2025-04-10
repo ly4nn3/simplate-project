@@ -5,8 +5,9 @@ import { processRecipe } from "../../utils/recipeUtils.js";
 
 export async function getRecipesByAppliance(applianceType) {
     try {
-        // Check cache first
+        // Log cache check
         const cachedRecipes = getCachedRecipes();
+        console.log('Cache status:', cachedRecipes ? 'Found cached recipes' : 'No cached recipes');
 
         if (cachedRecipes) {
             if (applianceType) {
@@ -18,15 +19,20 @@ export async function getRecipesByAppliance(applianceType) {
             return cachedRecipes;
         }
 
+        // Log API request
+        console.log('Making API request...');
         const response = await fetch(
             `${API_CONFIG.SPOONACULAR.BASE_URL}${API_CONFIG.SPOONACULAR.ENDPOINTS.RANDOM_RECIPES}?number=${API_CONFIG.SPOONACULAR.PARAMS.DEFAULT_RECIPE_COUNT}&apiKey=${API_CONFIG.SPOONACULAR.API_KEY}`
         );
+
+        console.log('API response status:', response.status);
 
         if (!response.ok) {
             throw new Error(`API Error: ${response.status}`);
         }
 
         const data = await response.json();
+        console.log('Received recipes count:', data.recipes?.length || 0);
 
         // Process recipes
         if (data.recipes && Array.isArray(data.recipes)) {
@@ -46,7 +52,8 @@ export async function getRecipesByAppliance(applianceType) {
         }
 
         return [];
-    } catch {
+    } catch (error) {
+        console.error('Recipe service error:', error);
         return [];
     }
 }
