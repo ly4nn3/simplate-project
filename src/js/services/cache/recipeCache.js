@@ -27,6 +27,7 @@ export function getCachedRecipes() {
 }
 
 export function cacheRecipes(recipes) {
+    console.log('Caching recipes:', recipes.length);
     try {
         if (!Array.isArray(recipes) || !recipes.length) {
             throw new Error("Invalid recipes data for caching");
@@ -43,4 +44,5 @@ export function cacheRecipes(recipes) {
         localStorage.removeItem(CACHE_KEYS.RECIPES);
         return false;
     }
+    console.log('Cache status after storing:', getCachedRecipes() ? 'Cache successful' : 'Cache failed');
 }
