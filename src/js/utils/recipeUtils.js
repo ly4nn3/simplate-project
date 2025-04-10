@@ -81,6 +81,7 @@ export function processRecipe(recipe) {
         equipment,
         ingredients,
         instructions,
+        analyzedInstructions: recipe.analyzedInstructions,
         summary: recipe.summary || "",
     };
 }
