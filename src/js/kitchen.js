@@ -64,9 +64,11 @@ export const initializeKitchen = () => {
             if (allAppliances.has(type)) {
                 element.style.opacity = "1";
                 element.classList.add("active", "hover-effect");
+                element.setAttribute("data-active-reason", "recipe-match");
             } else {
                 element.style.opacity = "0";
                 element.classList.remove("active", "hover-effect");
+                element.removeAttribute("data-active-reason");
             }
         });
     };
