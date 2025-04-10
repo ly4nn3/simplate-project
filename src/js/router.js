@@ -1,4 +1,5 @@
 import { initializeKitchen } from "./kitchen.js";
+import { getRecipesByAppliance } from "./services/api/recipeService.js";
 
 // Router function for different views
 export const router = async (path) => {
@@ -15,10 +16,8 @@ export const router = async (path) => {
         "/about": "About", // About page
     };
 
-    // Default to "/" if path not found
     const view = routes[basePath] || routes["/"];
 
-    // Reference app container
     const app = document.getElementById("app");
 
     // View rendering switch
@@ -26,8 +25,15 @@ export const router = async (path) => {
         switch (view) {
         case "Kitchen":
             app.innerHTML = await renderKitchen();
-            // Have to initialize kitchen interactions after rendering
-            initializeKitchen();
+
+            requestAnimationFrame(() => {
+                const kitchen = initializeKitchen();
+                getRecipesByAppliance("").then((recipes) => {
+                    if (recipes) {
+                        kitchen.highlightActiveAppliances(recipes);
+                    }
+                });
+            });
             break;
         case "Recipes":
             app.innerHTML = await renderRecipes(applianceType);
@@ -42,8 +48,13 @@ export const router = async (path) => {
             app.innerHTML = await renderKitchen();
             initializeKitchen();
         }
-    } catch (error) {
-        alert("Routing error:", error);
+    } catch {
+        app.innerHTML = `
+            <div class="error">
+                <h2>Error loading page</h2>
+                <button data-navigate="/">Return to Kitchen</button>
+            </div>
+        `;
     }
 };
 

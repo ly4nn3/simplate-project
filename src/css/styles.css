@@ -28,7 +28,7 @@ h1 {
 }
 
 h2 {
-    font-family: var(--font-h2)
+    font-family: var(--font-h2);
 }
 .recipes,
 .book {
