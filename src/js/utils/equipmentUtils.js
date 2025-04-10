@@ -55,58 +55,48 @@ export function categorizeEquipment(equipmentList) {
 }
 
 export function getRequiredAppliances(recipe) {
-    console.log('Processing recipe:', {
-        title: recipe.title,
-        hasInstructions: !!recipe.analyzedInstructions?.length
-    });
-
     if (!recipe) return new Set();
 
     const requiredAppliances = new Set();
+    console.log('Processing recipe:', {
+        title: recipe.title,
+        hasInstructions: !!recipe.analyzedInstructions?.length,
+        firstStep: recipe.analyzedInstructions?.[0]?.steps?.[0]
+    });
 
-    // Check equipment in 'analyzed instructions'
     if (recipe.analyzedInstructions?.length > 0) {
         recipe.analyzedInstructions.forEach((instruction) => {
-            console.log('Instruction steps:', instruction.steps?.length);
-            
             instruction.steps?.forEach((step) => {
-                console.log('Step equipment:', step.equipment);
-                console.log('Step text:', step.step);
+                // Log each step's details
+                console.log('Step details:', {
+                    text: step.step,
+                    equipment: step.equipment,
+                });
 
-                // Process equipment
                 step.equipment?.forEach((equipment) => {
                     const equipmentName = equipment.name.toLowerCase();
-                    console.log('Checking equipment:', equipmentName);
-
-                    // Check equipment from categories
-                    for (const [appliance, data] of Object.entries(
-                        equipmentCategories.hasAsset
-                    )) {
-                        if (data.equipment.includes(equipmentName)) {
-                            console.log(`Found appliance match: ${appliance}`);
-                            requiredAppliances.add(appliance);
-                        }
-                    }
+                    console.log('Checking equipment:', {
+                        name: equipmentName,
+                        categories: Object.keys(equipmentCategories.hasAsset)
+                    });
                 });
 
                 // Check step text
                 const stepText = step.step.toLowerCase();
-                for (const [appliance, data] of Object.entries(
-                    equipmentCategories.hasAsset
-                )) {
-                    if (
-                        data.indicators.some((indicator) =>
-                            stepText.includes(indicator)
-                        )
-                    ) {
-                        console.log(`Found indicator match: ${appliance}`);
+                Object.entries(equipmentCategories.hasAsset).forEach(([appliance, data]) => {
+                    const foundIndicator = data.indicators.find(i => stepText.includes(i));
+                    if (foundIndicator) {
+                        console.log('Found indicator:', {
+                            appliance,
+                            indicator: foundIndicator,
+                            stepText
+                        });
                         requiredAppliances.add(appliance);
                     }
-                }
+                });
             });
         });
     }
 
-    console.log('Required appliances for recipe:', Array.from(requiredAppliances));
     return requiredAppliances;
 }

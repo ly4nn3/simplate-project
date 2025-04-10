@@ -32,11 +32,11 @@ export const equipmentCategories = {
             equipment: ["microwave-safe dish", "microwave plate"],
             indicators: ["microwave"],
         },
-        "cutting board": {
+        board: {
             equipment: ["cutting board", "chopping board"],
             indicators: ["chop", "dice", "slice", "cut"],
         },
-        "rice cooker": {
+        ricecooker: {
             equipment: ["rice cooker"],
             indicators: ["rice cooker"],
         },

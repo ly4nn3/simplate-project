@@ -70,12 +70,13 @@ export const initializeKitchen = () => {
 
         applianceElements.forEach((element) => {
             const type = element.className.split("-")[0];
-            console.log('Checking appliance:', {
-                type,
-                isRequired: allAppliances.has(type),
-                element: element
+            console.log('Element details:', {
+                fullClassName: element.className,
+                extractedType: type,
+                matchFound: allAppliances.has(type),
+                allAppliances: Array.from(allAppliances)
             });
-
+    
             if (allAppliances.has(type)) {
                 element.style.opacity = "1";
                 element.classList.add("active", "hover-effect");
