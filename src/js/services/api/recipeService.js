@@ -5,9 +5,12 @@ import { processRecipe } from "../../utils/recipeUtils.js";
 
 export async function getRecipesByAppliance(applianceType) {
     try {
-        // Log cache check
+        // Check cache first
         const cachedRecipes = getCachedRecipes();
-        console.log('Cache status:', cachedRecipes ? 'Found cached recipes' : 'No cached recipes');
+        console.log('Cache check:', {
+            hasCachedRecipes: !!cachedRecipes,
+            recipesCount: cachedRecipes?.length
+        });
 
         if (cachedRecipes) {
             if (applianceType) {
@@ -19,24 +22,44 @@ export async function getRecipesByAppliance(applianceType) {
             return cachedRecipes;
         }
 
-        // Log API request
-        console.log('Making API request...');
-        const response = await fetch(
-            `${API_CONFIG.SPOONACULAR.BASE_URL}${API_CONFIG.SPOONACULAR.ENDPOINTS.RANDOM_RECIPES}?number=${API_CONFIG.SPOONACULAR.PARAMS.DEFAULT_RECIPE_COUNT}&apiKey=${API_CONFIG.SPOONACULAR.API_KEY}`
-        );
+        // Log the API request URL (remove API key for security)
+        const apiUrl = `${API_CONFIG.SPOONACULAR.BASE_URL}${API_CONFIG.SPOONACULAR.ENDPOINTS.RANDOM_RECIPES}?number=${API_CONFIG.SPOONACULAR.PARAMS.DEFAULT_RECIPE_COUNT}&apiKey=${API_CONFIG.SPOONACULAR.API_KEY}`;
+        console.log('Fetching from:', apiUrl.replace(API_CONFIG.SPOONACULAR.API_KEY, 'HIDDEN_KEY'));
 
-        console.log('API response status:', response.status);
+        const response = await fetch(apiUrl);
+        
+        console.log('API Response:', {
+            status: response.status,
+            ok: response.ok,
+        });
 
         if (!response.ok) {
             throw new Error(`API Error: ${response.status}`);
         }
 
         const data = await response.json();
-        console.log('Received recipes count:', data.recipes?.length || 0);
+        
+        console.log('API Data:', {
+            hasRecipes: !!data.recipes,
+            recipesCount: data.recipes?.length,
+            sampleRecipe: data.recipes?.[0] ? {
+                title: data.recipes[0].title,
+                hasInstructions: !!data.recipes[0].analyzedInstructions?.length,
+                instructionsCount: data.recipes[0].analyzedInstructions?.length
+            } : null
+        });
 
         // Process recipes
         if (data.recipes && Array.isArray(data.recipes)) {
             const processedRecipes = data.recipes.map(processRecipe);
+            console.log('Processed recipes:', {
+                count: processedRecipes.length,
+                sampleProcessed: processedRecipes[0] ? {
+                    title: processedRecipes[0].title,
+                    hasInstructions: !!processedRecipes[0].instructions?.length
+                } : null
+            });
+
 
             cacheRecipes(processedRecipes);
 
