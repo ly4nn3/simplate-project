@@ -44,5 +44,4 @@ export function cacheRecipes(recipes) {
         localStorage.removeItem(CACHE_KEYS.RECIPES);
         return false;
     }
-    console.log('Cache status after storing:', getCachedRecipes() ? 'Cache successful' : 'Cache failed');
 }

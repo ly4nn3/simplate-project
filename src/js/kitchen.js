@@ -43,30 +43,47 @@ export const initializeKitchen = () => {
     };
 
     const highlightActiveAppliances = (recipes) => {
-        if (!recipes || !Array.isArray(recipes)) return;
+        console.log('Highlighting appliances for recipes:', recipes?.length);
+        if (!recipes || !Array.isArray(recipes)) {
+            console.log('No recipes provided for highlighting');
+            return;
+        }
 
         const allAppliances = new Set();
 
         recipes.forEach((recipe) => {
             const requiredAppliances = getRequiredAppliances(recipe);
-            requiredAppliances.forEach((appliance) =>
-                allAppliances.add(appliance)
-            );
+            console.log('Required appliances for recipe:', {
+                recipeTitle: recipe.title,
+                appliances: Array.from(requiredAppliances)
+            });
+            requiredAppliances.forEach((appliance) => allAppliances.add(appliance));
         });
+
+        console.log('All required appliances:', Array.from(allAppliances));
 
         const applianceElements = kitchen.querySelectorAll(
             ".interactive-zones [data-navigate]:not(.book-aa)"
         );
+        
+        console.log('Found appliance elements:', applianceElements.length);
 
         applianceElements.forEach((element) => {
             const type = element.className.split("-")[0];
+            console.log('Checking appliance:', {
+                type,
+                isRequired: allAppliances.has(type),
+                element: element
+            });
 
             if (allAppliances.has(type)) {
                 element.style.opacity = "1";
                 element.classList.add("active", "hover-effect");
+                console.log(`Activated ${type}`);
             } else {
                 element.style.opacity = "0";
                 element.classList.remove("active", "hover-effect");
+                console.log(`Deactivated ${type}`);
             }
         });
     };
