@@ -5,6 +5,13 @@ export function processRecipe(recipe) {
         throw new Error("Invalid recipe data");
     }
 
+    console.log('Processing raw recipe:', {
+        title: recipe.title,
+        hasRawInstructions: !!recipe.analyzedInstructions?.length,
+        rawInstructionsCount: recipe.analyzedInstructions?.length,
+        firstInstruction: recipe.analyzedInstructions?.[0]
+    });
+
     const equipmentFound = new Set();
 
     if (recipe.analyzedInstructions?.length > 0) {
@@ -50,40 +57,48 @@ export function processRecipe(recipe) {
             })
             .filter(Boolean) || [];
 
-    const instructions =
-        recipe.analyzedInstructions?.[0]?.steps
-            .map((step) => {
+            const instructions = recipe.analyzedInstructions?.[0]?.steps
+            ?.map((step) => {
                 if (!step) return null;
-
+    
                 return {
                     number: step.number,
                     step: step.step,
-                    equipment:
-                        step.equipment?.map((eq) => eq.name.toLowerCase()) ||
-                        [],
+                    equipment: step.equipment?.map((eq) => eq.name.toLowerCase()) || [],
                 };
             })
             .filter(Boolean) || [];
-
-    return {
-        id: recipe.id || 0,
-        title: recipe.title || "",
-        image: recipe.image || "",
-        readyInMinutes: recipe.readyInMinutes || 0,
-        servings: recipe.servings || 0,
-        source: {
-            url: recipe.sourceUrl || "",
-            name: recipe.sourceName || "",
-            credits: recipe.creditsText || "",
-            license: recipe.license || "",
-        },
-        dietary,
-        equipment,
-        ingredients,
-        instructions,
-        summary: recipe.summary || "",
-    };
-}
+    
+        const processed = {
+            id: recipe.id || 0,
+            title: recipe.title || "",
+            image: recipe.image || "",
+            readyInMinutes: recipe.readyInMinutes || 0,
+            servings: recipe.servings || 0,
+            source: {
+                url: recipe.sourceUrl || "",
+                name: recipe.sourceName || "",
+                credits: recipe.creditsText || "",
+                license: recipe.license || "",
+            },
+            dietary,
+            equipment,
+            ingredients,
+            instructions,
+            analyzedInstructions: recipe.analyzedInstructions, // Add this line
+            summary: recipe.summary || "",
+        };
+    
+        console.log('Processed recipe:', {
+            title: processed.title,
+            hasInstructions: !!processed.instructions?.length,
+            hasAnalyzedInstructions: !!processed.analyzedInstructions?.length,
+            instructionsCount: processed.instructions?.length,
+            analyzedInstructionsCount: processed.analyzedInstructions?.length
+        });
+    
+        return processed;
+    }
 
 export function filterRecipesByDiet(recipes, dietaryRestrictions) {
     if (!Array.isArray(recipes) || !Array.isArray(dietaryRestrictions)) {
