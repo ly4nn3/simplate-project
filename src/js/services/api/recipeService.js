@@ -1,21 +1,21 @@
 import { API_CONFIG } from "../../constants/apiConfig.js";
-import { getCachedRecipes, cacheRecipes } from "../cache/recipeCache.js";
-import { getRequiredAppliances } from "../../utils/equipmentUtils.js";
+import { getCachedResponse, cacheResponse } from "../cache/recipeCache.js";
 import { processRecipe } from "../../utils/recipeUtils.js";
 
 export async function getRecipesByAppliance(applianceType) {
     try {
-        // Check cache first
-        const cachedRecipes = getCachedRecipes();
+        const cachedResponse = getCachedResponse();
 
-        if (cachedRecipes) {
+        if (cachedResponse) {
+            const processedRecipes = cachedResponse.recipes.map(processRecipe);
+
             if (applianceType) {
-                return cachedRecipes.filter((recipe) => {
-                    const requiredAppliances = getRequiredAppliances(recipe);
-                    return requiredAppliances.has(applianceType.toLowerCase());
-                });
+                return processedRecipes.filter(
+                    (recipe) =>
+                        recipe.equipment.primary === applianceType.toLowerCase()
+                );
             }
-            return cachedRecipes;
+            return processedRecipes;
         }
 
         const response = await fetch(
@@ -27,25 +27,85 @@ export async function getRecipesByAppliance(applianceType) {
         }
 
         const data = await response.json();
+        cacheResponse(data);
 
-        // Process recipes
         if (data.recipes && Array.isArray(data.recipes)) {
             const processedRecipes = data.recipes.map(processRecipe);
 
-            cacheRecipes(processedRecipes);
-
-            // Return filtered/all recipes
             if (applianceType) {
-                return processedRecipes.filter((recipe) => {
-                    const requiredAppliances = getRequiredAppliances(recipe);
-                    return requiredAppliances.has(applianceType.toLowerCase());
-                });
+                return processedRecipes.filter(
+                    (recipe) =>
+                        recipe.equipment.primary === applianceType.toLowerCase()
+                );
             }
 
             return processedRecipes;
         }
 
         return [];
+    } catch {
+        return [];
+    }
+}
+
+export async function getRecipeById(recipeId, applianceType) {
+    try {
+        const cachedResponse = getCachedResponse();
+
+        if (cachedResponse && cachedResponse.recipes) {
+            const cachedRecipe = cachedResponse.recipes.find(
+                (recipe) => recipe.id === parseInt(recipeId)
+            );
+
+            if (cachedRecipe) {
+                const processed = processRecipe(cachedRecipe);
+                if (applianceType) {
+                    processed.equipment = {
+                        ...processed.equipment,
+                        primary: applianceType,
+                    };
+                }
+                return processed;
+            }
+        }
+
+        // If not in cache, fetch API
+        const response = await fetch(
+            `${API_CONFIG.SPOONACULAR.BASE_URL}/recipes/${recipeId}/information?apiKey=${API_CONFIG.SPOONACULAR.API_KEY}`
+        );
+
+        if (!response.ok) {
+            throw new Error(`API Error: ${response.status}`);
+        }
+
+        const recipeData = await response.json();
+
+        try {
+            const existingCache = getCachedResponse() || { recipes: [] };
+
+            const recipeIndex = existingCache.recipes.findIndex(
+                (r) => r.id === parseInt(recipeId)
+            );
+
+            if (recipeIndex >= 0) {
+                existingCache.recipes[recipeIndex] = recipeData;
+            } else {
+                existingCache.recipes.push(recipeData);
+            }
+
+            cacheResponse(existingCache);
+        } catch {
+            return [];
+        }
+
+        const processed = processRecipe(recipeData);
+        if (applianceType) {
+            processed.equipment = {
+                ...processed.equipment,
+                primary: applianceType,
+            };
+        }
+        return processed;
     } catch {
         return [];
     }

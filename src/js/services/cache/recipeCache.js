@@ -1,6 +1,6 @@
 import { CACHE_KEYS, CACHE_DURATION } from "../../constants/apiConfig.js";
 
-export function getCachedRecipes() {
+export function getCachedResponse() {
     try {
         const cached = localStorage.getItem(CACHE_KEYS.RECIPES);
 
@@ -11,7 +11,7 @@ export function getCachedRecipes() {
         const parsedCache = JSON.parse(cached);
 
         if (
-            !parsedCache.recipes ||
+            !parsedCache.data ||
             !parsedCache.timestamp ||
             Date.now() - parsedCache.timestamp > CACHE_DURATION.RECIPES
         ) {
@@ -19,21 +19,21 @@ export function getCachedRecipes() {
             return null;
         }
 
-        return parsedCache.recipes;
+        return parsedCache.data;
     } catch {
         localStorage.removeItem(CACHE_KEYS.RECIPES);
         return null;
     }
 }
 
-export function cacheRecipes(recipes) {
+export function cacheResponse(data) {
     try {
-        if (!Array.isArray(recipes) || !recipes.length) {
-            throw new Error("Invalid recipes data for caching");
+        if (!data || !data.recipes || !Array.isArray(data.recipes)) {
+            throw new Error("Invalid API response data for caching");
         }
 
         const cacheData = {
-            recipes,
+            data,
             timestamp: Date.now(),
         };
 

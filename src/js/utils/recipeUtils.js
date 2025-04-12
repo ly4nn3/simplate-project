@@ -1,4 +1,7 @@
-import { categorizeEquipment } from "./equipmentUtils.js";
+import {
+    categorizeEquipment,
+    identifyPrimaryEquipment,
+} from "./equipmentUtils.js";
 
 export function processRecipe(recipe) {
     if (!recipe || typeof recipe !== "object") {
@@ -19,7 +22,10 @@ export function processRecipe(recipe) {
         });
     }
 
-    const equipment = categorizeEquipment(Array.from(equipmentFound));
+    const equipment = {
+        ...categorizeEquipment(Array.from(equipmentFound)),
+        primary: identifyPrimaryEquipment(recipe) || null,
+    };
 
     const dietary = {
         glutenFree: Boolean(recipe.glutenFree),
@@ -31,6 +37,7 @@ export function processRecipe(recipe) {
         primal: Boolean(recipe.primal),
         lowFodmap: Boolean(recipe.lowFodmap),
         whole30: Boolean(recipe.whole30),
+        diets: recipe.diets || [],
     };
 
     const ingredients =
@@ -50,21 +57,6 @@ export function processRecipe(recipe) {
             })
             .filter(Boolean) || [];
 
-    const instructions =
-        recipe.analyzedInstructions?.[0]?.steps
-            .map((step) => {
-                if (!step) return null;
-
-                return {
-                    number: step.number,
-                    step: step.step,
-                    equipment:
-                        step.equipment?.map((eq) => eq.name.toLowerCase()) ||
-                        [],
-                };
-            })
-            .filter(Boolean) || [];
-
     return {
         id: recipe.id || 0,
         title: recipe.title || "",
@@ -80,9 +72,8 @@ export function processRecipe(recipe) {
         dietary,
         equipment,
         ingredients,
-        instructions,
+        instructions: recipe.instructions || "",
         analyzedInstructions: recipe.analyzedInstructions,
-        summary: recipe.summary || "",
     };
 }
 
@@ -99,3 +90,150 @@ export function filterRecipesByDiet(recipes, dietaryRestrictions) {
         );
     });
 }
+
+export function categorizeRecipesByEquipment(recipes) {
+    if (!Array.isArray(recipes)) return {};
+
+    const categorized = {
+        stove: [],
+        oven: [],
+        microwave: [],
+        board: [],
+        ricecooker: [],
+        specialized: [],
+        basic: [],
+    };
+
+    recipes.forEach((recipe) => {
+        if (recipe.equipment.primary) {
+            categorized[recipe.equipment.primary].push(recipe);
+        } else if (recipe.equipment.hasSpecializedEquipment) {
+            categorized.specialized.push(recipe);
+        } else {
+            categorized.basic.push(recipe);
+        }
+    });
+
+    return categorized;
+}
+
+export const getRandomRecipes = (recipes, count = 6) => {
+    if (!Array.isArray(recipes) || recipes.length === 0) {
+        return [];
+    }
+
+    const shuffled = [...recipes].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, Math.min(count, shuffled.length));
+};
+
+export const getDisplayedRecipes = (allRecipes, applianceType) => {
+    if (!Array.isArray(allRecipes) || allRecipes.length === 0) {
+        return [];
+    }
+
+    const storageKey = `displayed_${applianceType}_recipes`;
+    let displayedRecipes;
+
+    try {
+        const storedRecipeIds = localStorage.getItem(storageKey);
+
+        if (storedRecipeIds) {
+            const ids = JSON.parse(storedRecipeIds);
+            displayedRecipes = allRecipes.filter((recipe) =>
+                ids.includes(recipe.id)
+            );
+
+            if (displayedRecipes.length < Math.min(6, allRecipes.length)) {
+                displayedRecipes = getRandomRecipes(allRecipes);
+                localStorage.setItem(
+                    storageKey,
+                    JSON.stringify(displayedRecipes.map((r) => r.id))
+                );
+            }
+        } else {
+            displayedRecipes = getRandomRecipes(allRecipes);
+            localStorage.setItem(
+                storageKey,
+                JSON.stringify(displayedRecipes.map((r) => r.id))
+            );
+        }
+    } catch {
+        displayedRecipes = getRandomRecipes(allRecipes);
+    }
+
+    return displayedRecipes;
+};
+
+export const updateDisplayedRecipes = (allRecipes, applianceType) => {
+    if (!Array.isArray(allRecipes) || allRecipes.length === 0) {
+        return [];
+    }
+
+    const storageKey = `displayed_${applianceType}_recipes`;
+    const newRecipes = getRandomRecipes(allRecipes);
+
+    try {
+        localStorage.setItem(
+            storageKey,
+            JSON.stringify(newRecipes.map((r) => r.id))
+        );
+    } catch {
+        return [];
+    }
+
+    return newRecipes;
+};
+
+export const renderRecipeCards = (recipes) => {
+    if (!Array.isArray(recipes) || recipes.length === 0) {
+        return "<div class=\"no-recipes\">No recipes found.</div>";
+    }
+
+    return recipes
+        .map(
+            (recipe) => `
+            <div class="recipe-card" data-navigate="/recipes?id=${recipe.id}">
+                <img src="${recipe.image}" alt="${recipe.title}" width="350" height="auto">
+                <div class="recipe-card-content">
+                    <h3>${recipe.title}</h3>
+                    <div class="recipe-meta">
+                        <span>⏲️ ${recipe.readyInMinutes} minutes</span>
+                        <span>🍽️ ${recipe.servings} servings</span>
+                    </div>
+                    <div class="recipe-equipment">
+                        ${renderEquipmentTags(recipe)}
+                    </div>
+                </div>
+            </div>
+        `
+        )
+        .join("");
+};
+
+export const renderEquipmentTags = (recipe) => {
+    if (!recipe || !recipe.equipment) {
+        return "";
+    }
+
+    const primary = recipe.equipment.primary
+        ? `<span class="equipment-tag primary">${recipe.equipment.primary}</span>`
+        : "";
+
+    const display = Array.isArray(recipe.equipment.display)
+        ? recipe.equipment.display
+            .filter((item) => item !== recipe.equipment.primary)
+            .map((item) => `<span class="equipment-tag">${item}</span>`)
+            .join("")
+        : "";
+
+    const specialized = Array.isArray(recipe.equipment.specialized)
+        ? recipe.equipment.specialized
+            .map(
+                (item) =>
+                    `<span class="equipment-tag specialized">⚠️ ${item}</span>`
+            )
+            .join("")
+        : "";
+
+    return `${primary}${display}${specialized}`;
+};

@@ -1,4 +1,4 @@
-export const equipmentCategories = {
+export const EQUIPMENT_CATEGORIES = {
     hasAsset: {
         stove: {
             equipment: [
@@ -17,6 +17,11 @@ export const equipmentCategories = {
                 "boil",
                 "fry",
                 "saute",
+                "cook over",
+                "heat oil",
+                "medium heat",
+                "high heat",
+                "low heat",
             ],
         },
         oven: {
@@ -26,15 +31,30 @@ export const equipmentCategories = {
                 "casserole dish",
                 "roasting pan",
             ],
-            indicators: ["bake", "roast", "broil"],
+            indicators: [
+                "bake",
+                "roast",
+                "broil",
+                "preheat",
+                "°f",
+                "°c",
+                "degrees",
+                "oven",
+            ],
         },
         microwave: {
             equipment: ["microwave-safe dish", "microwave plate"],
-            indicators: ["microwave"],
+            indicators: [
+                "microwave",
+                "90 second",
+                "90 seconds",
+                "minute and a half",
+                "1 min 30 sec",
+            ],
         },
         board: {
             equipment: ["cutting board", "chopping board"],
-            indicators: ["chop", "dice", "slice", "cut"],
+            indicators: ["chop", "dice", "slice", "cut", "mince"],
         },
         ricecooker: {
             equipment: ["rice cooker"],
@@ -69,6 +89,7 @@ export const equipmentCategories = {
     specialized: [
         "ice cream machine",
         "food processor",
+        "hand mixer",
         "stand mixer",
         "pressure cooker",
         "instant pot",
@@ -85,5 +106,41 @@ export const equipmentCategories = {
         "blow torch",
         "meat grinder",
         "pizza stone",
+        "grill",
     ],
+    ingredientBased: {
+        stove: [
+            "pasta",
+            "noodle",
+            "spaghetti",
+            "fettuccine",
+            "linguine",
+            "penne",
+            "bigoli",
+            "risotto",
+        ],
+        oven: [
+            "baked potato",
+            "roasted potato",
+            "baked sweet potato",
+            "roasted sweet potato",
+        ],
+    },
+
+    dishTypes: {
+        oven: [
+            "muffin",
+            "cake",
+            "bread",
+            "cookie",
+            "pie",
+            "pastry",
+            "brownie",
+            "baked",
+            "roasted",
+            "gratin",
+            "soufflé",
+        ],
+        microwave: ["90 second cookie", "microwave cookie", "mug cake"],
+    },
 };

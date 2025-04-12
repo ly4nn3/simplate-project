@@ -1,4 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Fragment+Mono:ital@0;1&family=Work+Sans:ital,wght@0,100..900;1,100..900&family=Zen+Loop:ital@0;1&display=swap");
+
 :root {
     --primary-color: #232e3f;
     --accent-color: #cf9421;
@@ -30,17 +31,337 @@ h1 {
 h2 {
     font-family: var(--font-h2);
 }
+
 .recipes,
 .book {
     padding: 20px;
     text-align: center;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
-.back-button {
-    padding: 10px 20px;
+.back-button,
+.randomize-button {
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    border: 1px solid var(--text-color);
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
     margin-bottom: 20px;
+    font-weight: 600;
+    transition: background-color 0.3s;
+    margin: 1rem;
+}
+
+.back-button:hover,
+.randomize-button:hover {
+    background-color: var(--accent-color);
+    border: 1px solid var(--primary-color);
+    box-shadow: 0 2px 8px rgba(207, 148, 33, 0.4);
+    color: var(--primary-color);
+}
+
+/* --------------------------- */
+/* START OF recipe card styles */
+.recipes-controls {
+    display: flex;
+    margin-bottom: 1rem;
+    gap: 1rem;
+    flex-wrap: flex;
+    justify-content: center;
+}
+
+.recipe-count {
+    color: var(--text2-color);
+    font-size: 0.9rem;
+}
+
+.recipes-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 25px;
+    max-width: 100%;
+    margin: 0 auto;
+    justify-content: center;
+}
+
+.recipe-card {
+    flex: 0 0 350px;
+    max-width: 100%;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    transition:
+        transform 0.3s,
+        box-shadow 0.3s;
+    background-color: var(--text-color);
+    position: relative;
+}
+
+.recipe-card:hover {
+    transform: translateY(-5px) rotate(-1deg);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
     cursor: pointer;
 }
+
+.recipe-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    position: relative;
+    z-index: 1;
+}
+
+.recipe-card-content {
+    padding: 15px;
+    position: relative;
+    z-index: 1;
+}
+
+.recipe-card h3 {
+    margin: 0 0 10px 0;
+    font-size: 1.2rem;
+    color: var(--primary-color);
+    font-family: var(--font-h2);
+    text-decoration: 2px var(--accent-color) underline;
+    text-underline-offset: 5px;
+    line-height: 1.5;
+}
+
+.recipe-meta {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    font-size: 0.9rem;
+    color: var(--primary-color);
+}
+
+.recipe-equipment {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+}
+
+.equipment-tag {
+    background-color: rgb(35, 46, 63, 0.1);
+    padding: 0.2rem 0.4rem;
+    border-radius: 16px;
+    font-size: 0.9rem;
+    color: var(--primary-color);
+    border: 1px solid rgb(35, 46, 63, 0.5);
+}
+
+.equipment-tag.primary {
+    background-color: rgb(207, 148, 33, 0.4);
+    color: var(--primary-color);
+    font-weight: 600;
+    border: 1px solid rgba(207, 148, 33);
+}
+
+.equipment-tag.specialized {
+    background-color: rgba(255, 109, 0, 0.15);
+    color: #5a0000;
+    font-weight: 600;
+    border: 1px solid rgba(255, 111, 0, 0.5);
+}
+/* END OF recipe card styles */
+/* --------------------------- */
+
+/* ----------------------------- */
+/* START OF recipe detail styles */
+.recipe-detail-page {
+    max-width: 700px;
+    width: 70%;
+    margin: 0 auto;
+    background-color: var(--text2-color);
+    padding: 2rem;
+    border-radius: 20px;
+}
+
+.recipe-detail-page button {
+    justify-content: center;
+}
+
+.recipe-details-content {
+    color: var(--primary-color);
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    padding: 2rem;
+    overflow: hidden;
+    background-image:
+        linear-gradient(0deg, rgb(35, 46, 63, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgb(35, 46, 63, 0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+    background-color: var(--text-color);
+}
+
+.recipe-header {
+    width: 350px;
+    margin: 0 auto;
+    background: var(--text-color);
+    border: var(--primary-color) 1px solid;
+    border-radius: 10px;
+    position: relative;
+}
+
+.header-content h2,
+.recipe-info h2 {
+    font-weight: normal;
+    letter-spacing: -0.5px;
+    text-decoration: underline;
+    text-underline-offset: 10px;
+    line-height: 1.5;
+    margin-top: 0;
+}
+
+.header-content {
+    padding: 1rem 1rem 0;
+}
+
+.header-image {
+    width: 100%;
+    position: relative;
+    padding-top: 66.67%;
+    overflow: hidden;
+    margin-top: 1rem;
+    border-radius: 0 0 10px 10px;
+}
+
+.header-image img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.recipe-meta {
+    border-bottom: var(--primary-color) 1px;
+}
+
+.recipe-tags {
+    margin: 20px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+    color: black;
+}
+
+.tags-group {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.tags-content {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: flex-start;
+}
+
+.dietary-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.diet-tag {
+    padding: 0.2rem 0.4rem;
+    border-radius: 16px;
+}
+
+.diet-tag.gluten-free {
+    background-color: rgb(76, 175, 80, 0.5);
+}
+
+.diet-tag.dairy-free {
+    background-color: rgb(33, 150, 243, 0.5);
+}
+
+.diet-tag.keto {
+    background-color: rgb(233, 30, 99, 0.5);
+}
+
+.diet-tag.whole30 {
+    background-color: rgb(244, 67, 54, 0.5);
+}
+
+.diet-tag.paleo {
+    background-color: rgb(121, 85, 72, 0.5);
+}
+
+.diet-tag.primal {
+    background-color: rgb(96, 125, 139, 0.5);
+}
+
+.diet-tag.pescatarian {
+    background-color: rgb(255, 153, 0, 0.5);
+}
+
+.diet-tag.vegetarian {
+    background-color: rgb(139, 195, 74, 0.5);
+}
+
+.diet-tag.vegan {
+    background-color: rgb(156, 39, 176, 0.4);
+}
+
+.diet-tag.low-fodmap {
+    background-color: rgb(255, 87, 34, 0.5);
+}
+
+.recipe-source {
+    margin-top: 15px;
+    font-style: italic;
+    color: #8a7a6d;
+    font-size: 0.9rem;
+}
+
+.recipe-source a {
+    color: var(--primary-color);
+    text-decoration: none;
+    border-bottom: 1px dotted #ccc;
+}
+
+.recipe-source a:hover {
+    color: #4a3a2d;
+    border-bottom: 1px solid #aaa;
+}
+
+.recipe-info {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.recipe-ingredients ul {
+    padding-left: 25px;
+    list-style-type: disc;
+}
+
+.recipe-ingredients li {
+    margin-bottom: 10px;
+    line-height: 1.5;
+}
+
+.instruction-steps {
+    line-height: 1.8;
+    counter-reset: step-counter;
+}
+
+.instruction-steps li {
+    margin-bottom: 20px;
+    position: relative;
+    padding-left: 25px;
+}
+/* END OF recipe detail styles */
+/* --------------------------- */
 
 .wip-container {
     max-width: 600px;
