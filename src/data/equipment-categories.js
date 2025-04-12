@@ -49,7 +49,7 @@ export const EQUIPMENT_CATEGORIES = {
                 "90 second",
                 "90 seconds",
                 "minute and a half",
-                "1 min 30 sec"
+                "1 min 30 sec",
             ],
         },
         board: {
@@ -123,10 +123,10 @@ export const EQUIPMENT_CATEGORIES = {
             "baked potato",
             "roasted potato",
             "baked sweet potato",
-            "roasted sweet potato"
-        ]
+            "roasted sweet potato",
+        ],
     },
-    
+
     dishTypes: {
         oven: [
             "muffin",
@@ -139,12 +139,8 @@ export const EQUIPMENT_CATEGORIES = {
             "baked",
             "roasted",
             "gratin",
-            "soufflé"
+            "soufflé",
         ],
-        microwave: [
-            "90 second cookie",
-            "microwave cookie",
-            "mug cake"
-        ]
-    }
+        microwave: ["90 second cookie", "microwave cookie", "mug cake"],
+    },
 };

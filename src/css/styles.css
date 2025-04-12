@@ -92,7 +92,9 @@ h2 {
     border-radius: 10px;
     overflow: hidden;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-    transition: transform 0.3s, box-shadow 0.3s;
+    transition:
+        transform 0.3s,
+        box-shadow 0.3s;
     background-color: var(--text-color);
     position: relative;
 }
@@ -189,7 +191,8 @@ h2 {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     padding: 2rem;
     overflow: hidden;
-    background-image: linear-gradient(0deg, rgb(35, 46, 63, 0.1) 1px, transparent 1px),
+    background-image:
+        linear-gradient(0deg, rgb(35, 46, 63, 0.1) 1px, transparent 1px),
         linear-gradient(90deg, rgb(35, 46, 63, 0.1) 1px, transparent 1px);
     background-size: 20px 20px;
     background-color: var(--text-color);
@@ -211,6 +214,7 @@ h2 {
     text-decoration: underline;
     text-underline-offset: 10px;
     line-height: 1.5;
+    margin-top: 0;
 }
 
 .header-content {
@@ -270,7 +274,6 @@ h2 {
 .diet-tag {
     padding: 0.2rem 0.4rem;
     border-radius: 16px;
-
 }
 
 .diet-tag.gluten-free {

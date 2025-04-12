@@ -1,6 +1,13 @@
 import { initializeKitchen } from "./kitchen.js";
-import { getDisplayedRecipes, updateDisplayedRecipes, renderRecipeCards } from "./utils/recipeUtils.js";
-import { getRecipesByAppliance, getRecipeById } from "./services/api/recipeService.js";
+import {
+    getDisplayedRecipes,
+    updateDisplayedRecipes,
+    renderRecipeCards,
+} from "./utils/recipeUtils.js";
+import {
+    getRecipesByAppliance,
+    getRecipeById,
+} from "./services/api/recipeService.js";
 import { renderRecipeDetails } from "./recipe/recipeDetails.js";
 
 export const router = async (path) => {
@@ -38,7 +45,10 @@ export const router = async (path) => {
             app.innerHTML = await renderRecipes(applianceType);
             break;
         case "RecipeDetail": // Match the route definition
-            app.innerHTML = await renderRecipeDetail(recipeId, applianceType);
+            app.innerHTML = await renderRecipeDetail(
+                recipeId,
+                applianceType
+            );
             break;
         case "Book":
             app.innerHTML = await renderBook();
@@ -50,9 +60,8 @@ export const router = async (path) => {
             app.innerHTML = await renderKitchen();
             initializeKitchen();
         }
-    } catch (error) {
-        console.error("Router error:", error);
-        app.innerHTML = `
+    } catch {
+        return `
             <div class="error">
                 <h2>Error loading page</h2>
                 <button data-navigate="/">Return to Kitchen</button>
@@ -109,13 +118,17 @@ const renderRecipes = async (applianceType) => {
             </div>
         </div>
     `;
-    
+
     setTimeout(() => {
         const randomizeButton = document.getElementById("randomize-recipes");
         if (randomizeButton) {
             randomizeButton.addEventListener("click", () => {
-                const newRecipes = updateDisplayedRecipes(allRecipes, applianceType);
-                document.querySelector(".recipes-grid").innerHTML = renderRecipeCards(newRecipes);
+                const newRecipes = updateDisplayedRecipes(
+                    allRecipes,
+                    applianceType
+                );
+                document.querySelector(".recipes-grid").innerHTML =
+                    renderRecipeCards(newRecipes);
             });
         }
     }, 0);
@@ -130,7 +143,7 @@ const renderRecipeDetail = async (recipeId, applianceType) => {
                 <h2>Recipe ID required</h2>
                 <div class="recipes-controls">
                     <button data-navigate="/" class="back-button">Back to Kitchen</button>
-                    <button data-navigate="/recipes?type=${applianceType || ''}">Return to Recipes</button>
+                    <button data-navigate="/recipes?type=${applianceType || ""}">Return to Recipes</button>
                 </div>
             </div>
         `;
@@ -145,7 +158,7 @@ const renderRecipeDetail = async (recipeId, applianceType) => {
                     <h2>Recipe not found</h2>
                     <div class="recipes-controls">
                         <button data-navigate="/" class="back-button">Back to Kitchen</button>
-                        <button data-navigate="/recipes?type=${applianceType || ''}">Return to Recipes</button>
+                        <button data-navigate="/recipes?type=${applianceType || ""}">Return to Recipes</button>
                     </div>
                 </div>
             `;
@@ -153,27 +166,27 @@ const renderRecipeDetail = async (recipeId, applianceType) => {
 
         const effectiveType = recipe.equipment?.primary || applianceType;
         const capitalizedType = effectiveType
-            ? effectiveType.charAt(0).toUpperCase() + effectiveType.slice(1).toLowerCase()
+            ? effectiveType.charAt(0).toUpperCase() +
+              effectiveType.slice(1).toLowerCase()
             : "All";
 
         return `
             <div class="recipe-detail-page">
                 <div class="recipes-controls">
                     <button data-navigate="/" class="back-button">Back to Kitchen</button>
-                    <button data-navigate="/recipes?type=${effectiveType || ''}" class="back-button">
+                    <button data-navigate="/recipes?type=${effectiveType || ""}" class="back-button">
                         Return to ${capitalizedType} Recipes
                     </button>
                 </div>
                 ${renderRecipeDetails(recipe)}
             </div>
         `;
-    } catch (error) {
-        console.error("Error loading recipe:", error);
+    } catch {
         return `
             <div class="error">
                 <h2>Error loading recipe details</h2>
                 <button data-navigate="/" class="back-button">Back to Kitchen</button>
-                <button data-navigate="/recipes?type=${applianceType || ''}">Return to Recipes</button>
+                <button data-navigate="/recipes?type=${applianceType || ""}">Return to Recipes</button>
             </div>
         `;
     }

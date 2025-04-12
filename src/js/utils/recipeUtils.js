@@ -37,7 +37,7 @@ export function processRecipe(recipe) {
         primal: Boolean(recipe.primal),
         lowFodmap: Boolean(recipe.lowFodmap),
         whole30: Boolean(recipe.whole30),
-        diets: recipe.diets || []
+        diets: recipe.diets || [],
     };
 
     const ingredients =
@@ -57,40 +57,25 @@ export function processRecipe(recipe) {
             })
             .filter(Boolean) || [];
 
-    const instructions =
-        recipe.analyzedInstructions?.[0]?.steps
-            .map((step) => {
-                if (!step) return null;
-
-                return {
-                    number: step.number,
-                    step: step.step,
-                    equipment:
-                        step.equipment?.map((eq) => eq.name.toLowerCase()) ||
-                        [],
-                };
-            })
-            .filter(Boolean) || [];
-
-            return {
-                id: recipe.id || 0,
-                title: recipe.title || "",
-                image: recipe.image || "",
-                readyInMinutes: recipe.readyInMinutes || 0,
-                servings: recipe.servings || 0,
-                source: {
-                    url: recipe.sourceUrl || "",
-                    name: recipe.sourceName || "",
-                    credits: recipe.creditsText || "",
-                    license: recipe.license || "",
-                },
-                dietary,
-                equipment,
-                ingredients,
-                instructions: recipe.instructions || "",
-                analyzedInstructions: recipe.analyzedInstructions,
-            };
-        }
+    return {
+        id: recipe.id || 0,
+        title: recipe.title || "",
+        image: recipe.image || "",
+        readyInMinutes: recipe.readyInMinutes || 0,
+        servings: recipe.servings || 0,
+        source: {
+            url: recipe.sourceUrl || "",
+            name: recipe.sourceName || "",
+            credits: recipe.creditsText || "",
+            license: recipe.license || "",
+        },
+        dietary,
+        equipment,
+        ingredients,
+        instructions: recipe.instructions || "",
+        analyzedInstructions: recipe.analyzedInstructions,
+    };
+}
 
 export function filterRecipesByDiet(recipes, dietaryRestrictions) {
     if (!Array.isArray(recipes) || !Array.isArray(dietaryRestrictions)) {
@@ -141,7 +126,7 @@ export const getRandomRecipes = (recipes, count = 6) => {
     return shuffled.slice(0, Math.min(count, shuffled.length));
 };
 
-export const getDisplayedRecipes= (allRecipes, applianceType) => {
+export const getDisplayedRecipes = (allRecipes, applianceType) => {
     if (!Array.isArray(allRecipes) || allRecipes.length === 0) {
         return [];
     }
@@ -154,15 +139,23 @@ export const getDisplayedRecipes= (allRecipes, applianceType) => {
 
         if (storedRecipeIds) {
             const ids = JSON.parse(storedRecipeIds);
-            displayedRecipes = allRecipes.filter(recipe => ids.includes(recipe.id));
+            displayedRecipes = allRecipes.filter((recipe) =>
+                ids.includes(recipe.id)
+            );
 
             if (displayedRecipes.length < Math.min(6, allRecipes.length)) {
                 displayedRecipes = getRandomRecipes(allRecipes);
-                localStorage.setItem(storageKey, JSON.stringify(displayedRecipes.map(r => r.id)));
+                localStorage.setItem(
+                    storageKey,
+                    JSON.stringify(displayedRecipes.map((r) => r.id))
+                );
             }
         } else {
             displayedRecipes = getRandomRecipes(allRecipes);
-            localStorage.setItem(storageKey, JSON.stringify(displayedRecipes.map(r => r.id)));
+            localStorage.setItem(
+                storageKey,
+                JSON.stringify(displayedRecipes.map((r) => r.id))
+            );
         }
     } catch {
         displayedRecipes = getRandomRecipes(allRecipes);
@@ -171,7 +164,7 @@ export const getDisplayedRecipes= (allRecipes, applianceType) => {
     return displayedRecipes;
 };
 
-export const updateDisplayedRecipes =(allRecipes, applianceType) => {
+export const updateDisplayedRecipes = (allRecipes, applianceType) => {
     if (!Array.isArray(allRecipes) || allRecipes.length === 0) {
         return [];
     }
@@ -180,7 +173,10 @@ export const updateDisplayedRecipes =(allRecipes, applianceType) => {
     const newRecipes = getRandomRecipes(allRecipes);
 
     try {
-        localStorage.setItem(storageKey, JSON.stringify(newRecipes.map(r => r.id)));
+        localStorage.setItem(
+            storageKey,
+            JSON.stringify(newRecipes.map((r) => r.id))
+        );
     } catch {
         return [];
     }
@@ -190,10 +186,12 @@ export const updateDisplayedRecipes =(allRecipes, applianceType) => {
 
 export const renderRecipeCards = (recipes) => {
     if (!Array.isArray(recipes) || recipes.length === 0) {
-        return `<div class="no-recipes">No recipes found.</div>`;
+        return "<div class=\"no-recipes\">No recipes found.</div>";
     }
 
-    return recipes.map((recipe) => `
+    return recipes
+        .map(
+            (recipe) => `
             <div class="recipe-card" data-navigate="/recipes?id=${recipe.id}">
                 <img src="${recipe.image}" alt="${recipe.title}" width="350" height="auto">
                 <div class="recipe-card-content">
@@ -208,15 +206,15 @@ export const renderRecipeCards = (recipes) => {
                 </div>
             </div>
         `
-    )
-    .join("");
+        )
+        .join("");
 };
 
 export const renderEquipmentTags = (recipe) => {
     if (!recipe || !recipe.equipment) {
-        return '';
+        return "";
     }
-    
+
     const primary = recipe.equipment.primary
         ? `<span class="equipment-tag primary">${recipe.equipment.primary}</span>`
         : "";
@@ -230,7 +228,10 @@ export const renderEquipmentTags = (recipe) => {
 
     const specialized = Array.isArray(recipe.equipment.specialized)
         ? recipe.equipment.specialized
-            .map((item) => `<span class="equipment-tag specialized">⚠️ ${item}</span>`)
+            .map(
+                (item) =>
+                    `<span class="equipment-tag specialized">⚠️ ${item}</span>`
+            )
             .join("")
         : "";
 

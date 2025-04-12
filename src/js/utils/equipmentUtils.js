@@ -79,27 +79,43 @@ function checkIngredientBasedCategory(recipe) {
         const ingredientName = ingredient.name.toLowerCase();
         const originalDesc = ingredient.original.toLowerCase();
 
-        if (RECIPE_CATEGORIES.ingredientBased.oven.some((term) =>
-                ingredientName.includes(term) || originalDesc.includes("in the oven"))) {
-                return "oven";
-            }
+        if (
+            RECIPE_CATEGORIES.ingredientBased.oven.some(
+                (term) =>
+                    ingredientName.includes(term) ||
+                    originalDesc.includes("in the oven")
+            )
+        ) {
+            return "oven";
+        }
 
-        if (RECIPE_CATEGORIES.ingredientBased.stove.some((term) =>
-            ingredientName.includes(term))) {
+        if (
+            RECIPE_CATEGORIES.ingredientBased.stove.some((term) =>
+                ingredientName.includes(term)
+            )
+        ) {
             return "stove";
         }
     }
 
-    if (recipe.title && RECIPE_CATEGORIES.dishTypes.microwave?.some(term =>
-        recipe.title.toLowerCase().includes(term))) {
+    if (
+        recipe.title &&
+        RECIPE_CATEGORIES.dishTypes.microwave?.some((term) =>
+            recipe.title.toLowerCase().includes(term)
+        )
+    ) {
         return "microwave";
     }
 
-    if (recipe.title && RECIPE_CATEGORIES.dishTypes.oven.some(term =>
-        recipe.title.toLowerCase().includes(term))) {
+    if (
+        recipe.title &&
+        RECIPE_CATEGORIES.dishTypes.oven.some((term) =>
+            recipe.title.toLowerCase().includes(term)
+        )
+    ) {
         return "oven";
     }
-    
+
     return null;
 }
 
@@ -108,9 +124,11 @@ function checkCookingMethod(steps) {
         .map((step) => step.step.toLowerCase())
         .join(" ");
 
-    if (RECIPE_CATEGORIES.cookingIndicators.microwave.some(
-        indicator => fullInstructions.includes(indicator)
-    )) {
+    if (
+        RECIPE_CATEGORIES.cookingIndicators.microwave.some((indicator) =>
+            fullInstructions.includes(indicator)
+        )
+    ) {
         return "microwave";
     }
 
@@ -118,7 +136,7 @@ function checkCookingMethod(steps) {
         RECIPE_CATEGORIES.cookingIndicators
     )) {
         if (appliance === "microwave") continue;
-        
+
         if (
             indicators.some((indicator) => fullInstructions.includes(indicator))
         ) {
