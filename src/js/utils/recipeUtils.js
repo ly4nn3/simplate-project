@@ -8,6 +8,12 @@ export function processRecipe(recipe) {
         throw new Error("Invalid recipe data");
     }
 
+    let imageUrl = recipe.image || "";
+
+    if (imageUrl && (imageUrl.endsWith(".") || !imageUrl.match(/\.(jpg|jpeg|png|gif)$/i))) {
+        imageUrl = imageUrl.endsWith(".") ? `${imageUrl}jpg` : `${imageUrl}.jpg`;
+    }
+
     const equipmentFound = new Set();
 
     if (recipe.analyzedInstructions?.length > 0) {
@@ -60,7 +66,7 @@ export function processRecipe(recipe) {
     return {
         id: recipe.id || 0,
         title: recipe.title || "",
-        image: recipe.image || "",
+        image: imageUrl || "",
         readyInMinutes: recipe.readyInMinutes || 0,
         servings: recipe.servings || 0,
         source: {
