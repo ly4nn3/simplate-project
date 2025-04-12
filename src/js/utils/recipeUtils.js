@@ -37,6 +37,7 @@ export function processRecipe(recipe) {
         primal: Boolean(recipe.primal),
         lowFodmap: Boolean(recipe.lowFodmap),
         whole30: Boolean(recipe.whole30),
+        diets: recipe.diets || []
     };
 
     const ingredients =
@@ -71,26 +72,25 @@ export function processRecipe(recipe) {
             })
             .filter(Boolean) || [];
 
-    return {
-        id: recipe.id || 0,
-        title: recipe.title || "",
-        image: recipe.image || "",
-        readyInMinutes: recipe.readyInMinutes || 0,
-        servings: recipe.servings || 0,
-        source: {
-            url: recipe.sourceUrl || "",
-            name: recipe.sourceName || "",
-            credits: recipe.creditsText || "",
-            license: recipe.license || "",
-        },
-        dietary,
-        equipment,
-        ingredients,
-        instructions,
-        analyzedInstructions: recipe.analyzedInstructions,
-        summary: recipe.summary || "",
-    };
-}
+            return {
+                id: recipe.id || 0,
+                title: recipe.title || "",
+                image: recipe.image || "",
+                readyInMinutes: recipe.readyInMinutes || 0,
+                servings: recipe.servings || 0,
+                source: {
+                    url: recipe.sourceUrl || "",
+                    name: recipe.sourceName || "",
+                    credits: recipe.creditsText || "",
+                    license: recipe.license || "",
+                },
+                dietary,
+                equipment,
+                ingredients,
+                instructions: recipe.instructions || "",
+                analyzedInstructions: recipe.analyzedInstructions,
+            };
+        }
 
 export function filterRecipesByDiet(recipes, dietaryRestrictions) {
     if (!Array.isArray(recipes) || !Array.isArray(dietaryRestrictions)) {
@@ -194,22 +194,22 @@ export const renderRecipeCards = (recipes) => {
     }
 
     return recipes.map((recipe) => `
-        <div class="recipe-card">
-                    <img src="${recipe.image}" alt="${recipe.title}" width="350" height="auto">
-                    <div class="recipe-card-content">
-                        <h3>${recipe.title}</h3>
-                        <div class="recipe-meta">
-                            <span>⏲️ ${recipe.readyInMinutes} minutes</span>
-                            <span>🍽️ ${recipe.servings} servings</span>
-                        </div>
-                        <div class="recipe-equipment">
-                            ${renderEquipmentTags(recipe)}
-                        </div>
+            <div class="recipe-card" data-navigate="/recipes?id=${recipe.id}">
+                <img src="${recipe.image}" alt="${recipe.title}" width="350" height="auto">
+                <div class="recipe-card-content">
+                    <h3>${recipe.title}</h3>
+                    <div class="recipe-meta">
+                        <span>⏲️ ${recipe.readyInMinutes} minutes</span>
+                        <span>🍽️ ${recipe.servings} servings</span>
+                    </div>
+                    <div class="recipe-equipment">
+                        ${renderEquipmentTags(recipe)}
                     </div>
                 </div>
-            `
-        )
-        .join("");
+            </div>
+        `
+    )
+    .join("");
 };
 
 export const renderEquipmentTags = (recipe) => {

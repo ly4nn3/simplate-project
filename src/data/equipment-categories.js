@@ -106,6 +106,7 @@ export const EQUIPMENT_CATEGORIES = {
         "blow torch",
         "meat grinder",
         "pizza stone",
+        "grill",
     ],
     ingredientBased: {
         stove: [
