@@ -1,0 +1,15 @@
+@media (max-width: 768px) {
+    .recipes-grid {
+        flex: 0 0 45%;
+    }
+}
+
+@media (max-width: 480px) {
+    .recipes-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .recipe-meta {
+        flex: 1 0 100%;
+    }
+}

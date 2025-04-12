@@ -1,5 +1,3 @@
-import { getRequiredAppliances } from "./utils/equipmentUtils.js";
-
 export const initializeKitchen = () => {
     const kitchen = document.querySelector(".kitchen-layout");
     if (!kitchen) return null;
@@ -8,12 +6,12 @@ export const initializeKitchen = () => {
     const addSparkles = (element) => {
         const type = element.className.split(" ")[0];
 
-        // Create sparkle container outside the clipped element
+        // Create sparkle container outside clipped element
         const sparkleContainer = document.createElement("div");
         sparkleContainer.className = `sparkle-container ${type}-sparkles`;
         element.parentNode.appendChild(sparkleContainer);
 
-        // Create sparkles in the container
+        // Create sparkles in container
         for (let i = 0; i < 3; i++) {
             const sparkle = document.createElement("span");
             sparkle.className = `sparkle sparkle-${type}`;
@@ -45,14 +43,9 @@ export const initializeKitchen = () => {
     const highlightActiveAppliances = (recipes) => {
         if (!recipes || !Array.isArray(recipes)) return;
 
-        const allAppliances = new Set();
-
-        recipes.forEach((recipe) => {
-            const requiredAppliances = getRequiredAppliances(recipe);
-            requiredAppliances.forEach((appliance) =>
-                allAppliances.add(appliance)
-            );
-        });
+        const activeAppliances = new Set(
+            recipes.map((recipe) => recipe.equipment.primary).filter(Boolean)
+        );
 
         const applianceElements = kitchen.querySelectorAll(
             ".interactive-zones [data-navigate]:not(.book-aa)"
@@ -61,7 +54,7 @@ export const initializeKitchen = () => {
         applianceElements.forEach((element) => {
             const type = element.className.split("-")[0];
 
-            if (allAppliances.has(type)) {
+            if (activeAppliances.has(type)) {
                 element.style.opacity = "1";
                 element.classList.add("active", "hover-effect");
                 element.setAttribute("data-active-reason", "recipe-match");

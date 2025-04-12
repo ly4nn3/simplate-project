@@ -1,4 +1,5 @@
 import { initializeKitchen } from "./kitchen.js";
+import { getDisplayedRecipes, updateDisplayedRecipes, renderRecipeCards } from "./utils/recipeUtils.js";
 import { getRecipesByAppliance } from "./services/api/recipeService.js";
 
 // Router function for different views
@@ -83,29 +84,41 @@ const renderKitchen = async () => {
 
 // Recipe view
 const renderRecipes = async (applianceType) => {
+    const allRecipes = await getRecipesByAppliance(applianceType);
+
+    const displayedRecipes = getDisplayedRecipes(allRecipes, applianceType);
+
     // Capitalize first letter only
     const capitalizedType = applianceType
         ? applianceType.charAt(0).toUpperCase() +
           applianceType.slice(1).toLowerCase()
         : "";
 
-    return `
+    const html = `
         <div class="recipes">
             <button data-navigate="/" class="back-button">Back to Kitchen</button>
-            
-            <div class="wip-container">
-                <h2>${capitalizedType} Recipes</h2>
-                <div class="wip-message">
-                    <p>🚧 Work in Progress 🚧</p>
-                    <p>Coming soon: Delicious ${capitalizedType} recipes!</p>
-                    <!-- Add placeholder for future gif -->
-                    <div class="gif-placeholder">
-                        <img src="/assets/images/work-in-progress.gif" alt="Work in Progress GIF" width="200" height="200">
-                    </div>
-                </div>
+            <h2>${capitalizedType} Recipes</h2>
+            <span class="recipe-count">[ ${allRecipes.length} recipe(s) available ]</span>
+            <div class="recipes-controls">
+                <button id="randomize-recipes" class="randomize-button">Show Different Recipes</button>
+            </div>
+            <div class="recipes-grid">
+                ${renderRecipeCards(displayedRecipes)}
             </div>
         </div>
     `;
+    
+    setTimeout(() => {
+        const randomizeButton = document.getElementById("randomize-recipes");
+        if (randomizeButton) {
+            randomizeButton.addEventListener("click", () => {
+                const newRecipes = updateDisplayedRecipes(allRecipes, applianceType);
+                document.querySelector(".recipes-grid").innerHTML = renderRecipeCards(newRecipes);
+            });
+        }
+    }, 0);
+
+    return html;
 };
 
 // Book view
