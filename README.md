@@ -27,12 +27,33 @@ A recipe hub website built with vanilla JavaScript, featuring an interactive kit
 - Maintains browser history
 - Query parameter support
 
+
+### Recipe Integration
+- Integration with Spoonacular API for recipe data
+- Smart appliance detection based on recipe instructions
+- Recipe categorization by cooking method and equipment
+- Local caching system for improved performance
+- Dietary information tags
+- Random recipe selection
+- Detailed recipe views with ingredients and instructions
+
+### Recipe Categories
+Automatic categorization based on:
+- Required equipment
+- Cooking methods
+- Ingredient types
+- Dish types
+- Dietary restrictions
+
 ## Technology Stack
 - Vanilla JavaScript (ES6+)
 - CSS3 with animations
 - HTML5
 - Sprite sheets for optimized graphics
 - Custom router implementation
+- Spoonacular API integration
+- Local storage for caching
+- Environment variable management with Vite
 
 ## Development Setup
 
@@ -48,6 +69,14 @@ npm install
 ```bash
 npm run dev
 ```
+4. Create a `.env` file in the root directory:
+```bash
+VITE_SPOONACULAR=your_api_key
+```
+- Note: You'll need a Spoonacular API key to fetch recipe data. Get one at Spoonacular's website.
+
+## Environment Variables
+- `VITE_SPOONACULAR` - Spoonacular API key
 
 ## Available Scripts
 - `npm run dev` - Start development server
