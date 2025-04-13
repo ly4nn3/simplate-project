@@ -1,3 +1,4 @@
+import { DIET_CATEGORIES } from "../../data/diet-categories.js";
 import {
     categorizeEquipment,
     identifyPrimaryEquipment,
@@ -10,8 +11,13 @@ export function processRecipe(recipe) {
 
     let imageUrl = recipe.image || "";
 
-    if (imageUrl && (imageUrl.endsWith(".") || !imageUrl.match(/\.(jpg|jpeg|png|gif)$/i))) {
-        imageUrl = imageUrl.endsWith(".") ? `${imageUrl}jpg` : `${imageUrl}.jpg`;
+    if (
+        imageUrl &&
+        (imageUrl.endsWith(".") || !imageUrl.match(/\.(jpg|jpeg|png|gif)$/i))
+    ) {
+        imageUrl = imageUrl.endsWith(".")
+            ? `${imageUrl}jpg`
+            : `${imageUrl}.jpg`;
     }
 
     const equipmentFound = new Set();
@@ -35,22 +41,18 @@ export function processRecipe(recipe) {
 
     const dietary = {
         glutenFree: Boolean(recipe.glutenFree),
-        ketogenic: Boolean(recipe.ketogenic),
+        dairyFree: Boolean(recipe.dairyFree),
         vegan: Boolean(recipe.vegan),
         vegetarian: Boolean(recipe.vegetarian),
-        pescetarian: Boolean(recipe.pescetarian),
-        paleo: Boolean(recipe.paleo),
-        primal: Boolean(recipe.primal),
         lowFodmap: Boolean(recipe.lowFodmap),
-        whole30: Boolean(recipe.whole30),
-        diets: recipe.diets || [],
+        diets:
+            recipe.diets && recipe.diets.length > 0 ? recipe.diets : ["normal"],
     };
 
     const ingredients =
         recipe.extendedIngredients
             ?.map((ingredient) => {
                 if (!ingredient) return null;
-
                 return {
                     name: ingredient.originalName,
                     amount: ingredient.amount,
@@ -83,18 +85,36 @@ export function processRecipe(recipe) {
     };
 }
 
-export function filterRecipesByDiet(recipes, dietaryRestrictions) {
-    if (!Array.isArray(recipes) || !Array.isArray(dietaryRestrictions)) {
+export function filterRecipesByDiet(recipes, selectedDiets) {
+    if (!Array.isArray(recipes) || !Array.isArray(selectedDiets)) {
         return [];
     }
 
     return recipes.filter((recipe) => {
         if (!recipe?.dietary) return false;
 
-        return dietaryRestrictions.every(
-            (restriction) => recipe.dietary[restriction] === true
-        );
+        return selectedDiets.every((diet) => {
+            if (diet in recipe.dietary) {
+                return recipe.dietary[diet] === true;
+            }
+
+            return recipe.dietary.diets.includes(diet.toLowerCase());
+        });
     });
+}
+
+export function getAllDiets(recipe) {
+    if (!recipe?.dietary) return [];
+
+    const diets = [...recipe.dietary.diets];
+
+    Object.entries(recipe.dietary).forEach(([key, value]) => {
+        if (key !== "diets" && value === true) {
+            diets.push(key.toLowerCase());
+        }
+    });
+
+    return diets;
 }
 
 export function categorizeRecipesByEquipment(recipes) {
@@ -190,30 +210,43 @@ export const updateDisplayedRecipes = (allRecipes, applianceType) => {
     return newRecipes;
 };
 
-export const renderRecipeCards = (recipes) => {
-    if (!Array.isArray(recipes) || recipes.length === 0) {
-        return "<div class=\"no-recipes\">No recipes found.</div>";
+export const renderDietaryTags = (recipe, compact = false) => {
+    if (!recipe || !recipe.dietary) return "";
+
+    const dietTags = new Set();
+
+    const booleanToDietKey = {
+        glutenFree: "gluten free",
+        dairyFree: "dairy free",
+        vegan: "vegan",
+        vegetarian: "lacto ovo vegetarian",
+        lowFodmap: "fodmap friendly",
+    };
+
+    const allDiets = new Set([
+        ...Object.entries(recipe.dietary)
+            .filter(([key, value]) => value === true && booleanToDietKey[key])
+            .map(([key]) => booleanToDietKey[key]),
+        ...(recipe.dietary.diets || []).map((diet) => diet.toLowerCase()),
+    ]);
+
+    allDiets.forEach((dietKey) => {
+        if (DIET_CATEGORIES[dietKey]) {
+            dietTags.add(
+                `<span class="diet-tag ${DIET_CATEGORIES[dietKey].className}">
+                    ${DIET_CATEGORIES[dietKey].display}
+                </span>`
+            );
+        }
+    });
+
+    if (compact) {
+        return Array.from(dietTags).join("");
     }
 
-    return recipes
-        .map(
-            (recipe) => `
-            <div class="recipe-card" data-navigate="/recipes?id=${recipe.id}">
-                <img src="${recipe.image}" alt="${recipe.title}" width="350" height="auto">
-                <div class="recipe-card-content">
-                    <h3>${recipe.title}</h3>
-                    <div class="recipe-meta">
-                        <span>⏲️ ${recipe.readyInMinutes} minutes</span>
-                        <span>🍽️ ${recipe.servings} servings</span>
-                    </div>
-                    <div class="recipe-equipment">
-                        ${renderEquipmentTags(recipe)}
-                    </div>
-                </div>
-            </div>
-        `
-        )
-        .join("");
+    return dietTags.size > 0
+        ? `<div class="dietary-tags">${Array.from(dietTags).join("")}</div>`
+        : "";
 };
 
 export const renderEquipmentTags = (recipe) => {
@@ -242,4 +275,33 @@ export const renderEquipmentTags = (recipe) => {
         : "";
 
     return `${primary}${display}${specialized}`;
+};
+
+export const renderRecipeCards = (recipes) => {
+    if (!Array.isArray(recipes) || recipes.length === 0) {
+        return "<div class=\"no-recipes\">No recipes found.</div>";
+    }
+
+    return recipes
+        .map(
+            (recipe) => `
+            <div class="recipe-card" data-navigate="/recipes?id=${recipe.id}">
+                <img src="${recipe.image}" alt="${recipe.title}" width="350" height="auto">
+                <div class="recipe-card-content">
+                    <h3>${recipe.title}</h3>
+                    <div class="recipe-meta">
+                        <span>⏲️ ${recipe.readyInMinutes} minutes</span>
+                        <span>🍽️ ${recipe.servings} servings</span>
+                    </div>
+                    <div class="recipe-equipment">
+                        ${renderEquipmentTags(recipe)}
+                    </div>
+                    <div class="recipe-dietary-tags">
+                        ${renderDietaryTags(recipe, true)}
+                    </div>
+                </div>
+            </div>
+        `
+        )
+        .join("");
 };

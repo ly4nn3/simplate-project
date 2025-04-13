@@ -1,50 +1,7 @@
-import { renderEquipmentTags } from "../utils/recipeUtils.js";
-
-export const renderDietaryTags = (recipe) => {
-    if (!recipe || !recipe.dietary) return "";
-
-    const dietTags = [];
-
-    if (recipe.dietary.glutenFree)
-        dietTags.push("<span class=\"diet-tag gluten-free\">Gluten Free</span>");
-    if (recipe.dietary.dairyFree)
-        dietTags.push("<span class=\"diet-tag dairy-free\">Dairy Free</span>");
-    if (recipe.dietary.vegetarian)
-        dietTags.push("<span class=\"diet-tag vegetarian\">Vegetarian</span>");
-    if (recipe.dietary.vegan)
-        dietTags.push("<span class=\"diet-tag vegan\">Vegan</span>");
-    if (recipe.dietary.lowFodmap)
-        dietTags.push("<span class=\"diet-tag low-fodmap\">Low FODMAP</span>");
-
-    // Check diets
-    if (Array.isArray(recipe.dietary.diets)) {
-        recipe.dietary.diets.forEach((diet) => {
-            switch (diet.toLowerCase()) {
-            case "paleolithic":
-            case "paleo":
-                dietTags.push("<span class=\"diet-tag paleo\">Paleo</span>");
-                break;
-            case "primal":
-                dietTags.push(
-                    "<span class=\"diet-tag primal\">Primal</span>"
-                );
-                break;
-            case "whole 30":
-                dietTags.push(
-                    "<span class=\"diet-tag whole30\">Whole30</span>"
-                );
-                break;
-            case "ketogenic":
-                dietTags.push("<span class=\"diet-tag keto\">Keto</span>");
-                break;
-            }
-        });
-    }
-
-    return dietTags.length > 0
-        ? `<div class="dietary-tags">${dietTags.join("")}</div>`
-        : "";
-};
+import {
+    renderEquipmentTags,
+    renderDietaryTags,
+} from "../utils/recipeUtils.js";
 
 export const renderRecipeDetails = (recipe) => {
     if (!recipe || typeof recipe !== "object") {
