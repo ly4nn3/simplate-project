@@ -1,4 +1,5 @@
 import { initializeKitchen } from "./kitchen.js";
+import { showBookModal } from "./bookModal.js";
 import {
     getDisplayedRecipes,
     updateDisplayedRecipes,
@@ -73,7 +74,8 @@ export const router = async (path) => {
             );
             break;
         case "Book":
-            app.innerHTML = await renderBook();
+            showBookModal();
+            history.pushState({}, "", "/");
             break;
         case "About":
             app.innerHTML = await renderAbout();
@@ -245,26 +247,6 @@ const renderRecipeDetail = async (recipeId, applianceType) => {
             </div>
         `;
     }
-};
-
-// Book view
-const renderBook = async () => {
-    return `
-        <div class="book">
-            <button data-navigate="/" class="back-button">Back to Kitchen</button>
-            
-            <div class="wip-container">
-                <h2>Today's Book Recommendation</h2>
-                <div class="wip-message">
-                    <p>🚧 Work in Progress 🚧</p>
-                    <p>Coming soon: Curated cookbook recommendations!</p>
-                    <div class="gif-placeholder">
-                        <img src="/assets/images/work-in-progress.gif" alt="Work in Progress GIF" width="200" height="200">
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
 };
 
 // About view

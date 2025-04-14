@@ -9,6 +9,16 @@ export const API_CONFIG = {
             DEFAULT_RECIPE_COUNT: 100,
         },
     },
+    BIGBOOK: {
+        BASE_URL: "https://api.bigbookapi.com",
+        API_KEY: import.meta.env.VITE_BIGBOOK,
+        ENDPOINTS: {
+            SEARCH_BOOKS: "/search-books",
+        },
+        PARAMS: {
+            DEFAULT_GENRES: "cookbook,food,health,gardening",
+        },
+    },
 };
 
 export const CACHE_KEYS = {
