@@ -8,12 +8,53 @@
     header {
         margin: 0 auto;
     }
+
+    .modal-content {
+        padding: 1rem;
+    }
+
+    .book-modal .book-image {
+        max-width: 180px;
+    }
+
+    .book-modal h2 {
+        font-size: 1.3rem;
+    }
+
+    .book-modal h3 {
+        font-size: 1.1rem;
+    }
+
+    .book-modal p {
+        font-size: 1rem;
+    }
+
     .recipes-grid {
         flex: 0 0 45%;
     }
 }
 
 @media (max-width: 480px) {
+    .modal-content {
+        padding: 1rem;
+    }
+
+    .book-modal .book-image {
+        max-width: 180px;
+    }
+
+    .book-modal h2 {
+        font-size: 1.3rem;
+    }
+
+    .book-modal h3 {
+        font-size: 1.1rem;
+    }
+
+    .book-modal p {
+        font-size: 1rem;
+    }
+
     .recipes-grid {
         grid-template-columns: 1fr;
     }

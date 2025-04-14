@@ -78,6 +78,7 @@ h2 {
         linear-gradient(90deg, rgb(35, 46, 63, 0.2) 1px, transparent 1px);
     background-size: 20px 20px;
     border-radius: 10px;
+    padding-bottom: 4rem;
 }
 
 .recipes h2 {
@@ -163,6 +164,10 @@ h2 {
     flex-wrap: wrap;
     gap: 6px;
     margin-top: 10px;
+}
+
+.no-recipes {
+    color: var(--primary-color);
 }
 /* END OF recipe card styles */
 /* --------------------------- */
@@ -425,6 +430,113 @@ button.diet-filter-tag.low-fodmap.active,
 }
 /* END OF sidebar styles */
 /* --------------------- */
+
+/* -------------------------- */
+/* START OF book modal styles */
+/* src/css/modal.css */
+.modal-container {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-container.active {
+    display: flex;
+}
+
+.loading-container {
+    text-align: center;
+    padding: 2rem;
+    font-size: 1.2rem;
+}
+
+.modal-content {
+    background: var(--text-color);
+    background-image:
+        linear-gradient(0deg, rgb(35, 46, 63, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgb(35, 46, 63, 0.1) 1px, transparent 1px);
+    background-size: 24px 24px;
+    color: var(--primary-color);
+    padding: 2rem;
+    border-radius: 8px;
+    max-width: 600px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.modal-close {
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
+    background: none;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    color: var(--text-primary);
+}
+
+.book-modal .book-content {
+    display: flex;
+    gap: 2rem;
+    margin-top: 1rem;
+}
+
+.book-image img {
+    max-width: 250px;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+.book-modal .book-details {
+    flex: 1;
+}
+
+.book-modal h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    text-decoration: var(--accent-color) underline;
+    text-underline-offset: 10px;
+}
+
+.book-modal h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.book-modal p {
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+    font-style: italic;
+}
+
+.book-genres {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.genre-tag {
+    padding: 0.5rem 1rem;
+    background: var(--text2-color);
+    border: 1px solid var(--primary-color);
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+/* END OF book modal styles */
+/* ------------------------ */
 
 /* ----------------------------- */
 /* START OF recipe detail styles */
