@@ -3,12 +3,14 @@ import {
     getDisplayedRecipes,
     updateDisplayedRecipes,
     renderRecipeCards,
+    filterRecipesByDiet,
 } from "./utils/recipeUtils.js";
 import {
     getRecipesByAppliance,
     getRecipeById,
 } from "./services/api/recipeService.js";
 import { renderRecipeDetails } from "./recipe/recipeDetails.js";
+import { renderDietFilter } from "./components/DietFilter.js";
 
 export const router = async (path) => {
     const basePath = path.split("?")[0];
@@ -37,6 +39,26 @@ export const router = async (path) => {
                 getRecipesByAppliance("").then((recipes) => {
                     if (recipes) {
                         kitchen.highlightActiveAppliances(recipes);
+
+                        const filterContainer = document.getElementById(
+                            "diet-filter-container"
+                        );
+                        if (filterContainer) {
+                            getRecipesByAppliance("").then((recipes) => {
+                                if (recipes) {
+                                    filterContainer.appendChild(
+                                        renderDietFilter(
+                                            recipes,
+                                            (filteredRecipes) => {
+                                                kitchen.highlightActiveAppliances(
+                                                    filteredRecipes
+                                                );
+                                            }
+                                        )
+                                    );
+                                }
+                            });
+                        }
                     }
                 });
             });
@@ -44,7 +66,7 @@ export const router = async (path) => {
         case "Recipes":
             app.innerHTML = await renderRecipes(applianceType);
             break;
-        case "RecipeDetail": // Match the route definition
+        case "RecipeDetail":
             app.innerHTML = await renderRecipeDetail(
                 recipeId,
                 applianceType
@@ -72,32 +94,45 @@ export const router = async (path) => {
 
 const renderKitchen = async () => {
     return `
-        <div class="kitchen">
-            <div class="kitchen-layout">
-                <!-- Base kitchen -->
-                <div class="base-kitchen"></div>
-                
-                <!-- Interactive elements -->
-                <div class="interactive-zones">
-                    <div class="oven-active" data-navigate="/recipes?type=oven"></div>
-                    <div class="stove-active" data-navigate="/recipes?type=stove"></div>
-                    <div class="microwave-active" data-navigate="/recipes?type=microwave"></div>
-                    <div class="ricecooker-active" data-navigate="/recipes?type=ricecooker"></div>
-                    <div class="board-active" data-navigate="/recipes?type=board"></div>
-                    <div class="book-aa" data-navigate="/book"></div>
+        <div class="kitchen-container">
+            <div class="kitchen">
+                <div class="kitchen-layout">
+                    <!-- Base kitchen -->
+                    <div class="base-kitchen"></div>
+                    
+                    <!-- Interactive elements -->
+                    <div class="interactive-zones">
+                        <div class="oven-active" data-navigate="/recipes?type=oven"></div>
+                        <div class="stove-active" data-navigate="/recipes?type=stove"></div>
+                        <div class="microwave-active" data-navigate="/recipes?type=microwave"></div>
+                        <div class="ricecooker-active" data-navigate="/recipes?type=ricecooker"></div>
+                        <div class="board-active" data-navigate="/recipes?type=board"></div>
+                        <div class="book-aa" data-navigate="/book"></div>
+                    </div>
                 </div>
-
-                <!-- + more interactive elements -->
             </div>
+            <div id="diet-filter-container"></div>
         </div>
     `;
 };
 
-// Recipe view
+// Recipe cards view
 const renderRecipes = async (applianceType) => {
     const allRecipes = await getRecipesByAppliance(applianceType);
 
-    const displayedRecipes = getDisplayedRecipes(allRecipes, applianceType);
+    const savedFilters = JSON.parse(
+        localStorage.getItem("selected_diet_filters") || "[]"
+    );
+
+    const filteredRecipes =
+        savedFilters.length > 0
+            ? filterRecipesByDiet(allRecipes, savedFilters)
+            : allRecipes;
+
+    const displayedRecipes = getDisplayedRecipes(
+        filteredRecipes,
+        applianceType
+    );
 
     // Capitalize first letter only
     const capitalizedType = applianceType
@@ -108,11 +143,12 @@ const renderRecipes = async (applianceType) => {
     const html = `
         <div class="recipes">
             <h2>${capitalizedType} Recipes</h2>
-            <span class="recipe-count">[ ${allRecipes.length} recipe(s) available ]</span>
+            <span class="recipe-count">[ ${filteredRecipes.length} recipe(s) available ]</span>
             <div class="recipes-controls">
                 <button data-navigate="/" class="back-button">Back to Kitchen</button>
                 <button id="randomize-recipes" class="randomize-button">Show Different Recipes</button>
             </div>
+            <div id="diet-filter-container"></div>
             <div class="recipes-grid">
                 ${renderRecipeCards(displayedRecipes)}
             </div>
@@ -124,18 +160,37 @@ const renderRecipes = async (applianceType) => {
         if (randomizeButton) {
             randomizeButton.addEventListener("click", () => {
                 const newRecipes = updateDisplayedRecipes(
-                    allRecipes,
+                    filteredRecipes,
                     applianceType
                 );
                 document.querySelector(".recipes-grid").innerHTML =
                     renderRecipeCards(newRecipes);
             });
         }
+
+        const filterContainer = document.getElementById(
+            "diet-filter-container"
+        );
+        if (filterContainer) {
+            filterContainer.appendChild(
+                renderDietFilter(allRecipes, (newFilteredRecipes) => {
+                    const newDisplayed = getDisplayedRecipes(
+                        newFilteredRecipes,
+                        applianceType
+                    );
+                    document.querySelector(".recipes-grid").innerHTML =
+                        renderRecipeCards(newDisplayed);
+                    document.querySelector(".recipe-count").textContent =
+                        `[ ${newFilteredRecipes.length} recipe(s) available ]`;
+                })
+            );
+        }
     }, 0);
 
     return html;
 };
 
+// Recipe detail view
 const renderRecipeDetail = async (recipeId, applianceType) => {
     if (!recipeId) {
         return `

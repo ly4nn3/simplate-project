@@ -1,4 +1,13 @@
+@media (min-width: 884px) {
+    .sparkle {
+        font-size: 16px;
+    }
+}
+
 @media (max-width: 768px) {
+    header {
+        margin: 0 auto;
+    }
     .recipes-grid {
         flex: 0 0 45%;
     }

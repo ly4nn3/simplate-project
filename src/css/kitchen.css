@@ -1,17 +1,55 @@
+*,
+*:before,
+*:after {
+    box-sizing: border-box;
+}
+
+#app {
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+}
+
+.kitchen-container {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+.kitchen {
+    width: 100%;
+    max-width: 884px;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
 .kitchen-layout {
     position: relative;
-    width: 880px;
-    height: 720px;
+    width: 100%;
+    max-width: 884px;
+    height: 0;
+    padding-bottom: 81.45%;
     margin: 0 auto;
+    box-sizing: border-box;
 }
 
 .base-kitchen {
     position: absolute;
     top: 0;
     left: 0;
-    width: 880px;
-    height: 720px;
+    width: 100%;
+    height: 100%;
     z-index: 1;
+}
+
+.interactive-zones {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
 }
 
 /* Interactive elements */
@@ -24,8 +62,8 @@
     position: absolute;
     top: 0;
     left: 0;
-    width: 880px;
-    height: 720px;
+    width: 100%;
+    height: 100%;
     cursor: pointer;
     z-index: 2;
 }
@@ -94,7 +132,7 @@
 .sparkle {
     position: absolute;
     pointer-events: none;
-    font-size: 16px;
+    font-size: 1rem;
     opacity: 0;
     transition: all 0.5s ease-out;
     filter: drop-shadow(0 0 5px rgba(255, 223, 0, 0.8)) brightness(1.2);
@@ -106,7 +144,6 @@
     animation: gentleFloat 2s ease-in-out infinite;
 }
 
-/* Sparkle positions by element */
 /* Oven */
 .sparkle-oven-active:nth-child(1) {
     left: 14%;
