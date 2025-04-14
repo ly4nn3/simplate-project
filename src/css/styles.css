@@ -169,34 +169,6 @@ h2 {
 
 /* ----------------------------------- */
 /* START OF tag & filter button styles */
-.diet-filter-controls {
-    margin-top: 1rem;
-    padding-top: 0.5rem;
-    text-align: center;
-    border-top: 1px solid var(--primary-color);
-}
-
-.clear-filters-btn {
-    justify-self: center;
-    margin: 0.2rem;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    height: 2rem;
-    padding: 0.4rem 1rem;
-    border-radius: 16px;
-    font-size: 0.9rem;
-    border: 1px solid rgb(35, 46, 63, 0.5);
-    box-sizing: border-box;
-    color: var(--text-color);
-    background-color: rgb(114, 8, 0);
-}
-
-.clear-filters-btn:hover {
-    background-color: rgb(244, 67, 54, 0.5);
-    color: var(--primary-color);
-}
-
 .diet-filter {
     position: fixed;
     text-align: center;
@@ -239,6 +211,34 @@ h2 {
 
 .diet-filter.active {
     right: 0;
+}
+
+.diet-filter-controls {
+    margin-top: 1rem;
+    padding-top: 0.5rem;
+    text-align: center;
+    border-top: 1px solid var(--primary-color);
+}
+
+.clear-filters-btn {
+    justify-self: center;
+    margin: 0.2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    height: 2rem;
+    padding: 0.4rem 1rem;
+    border-radius: 16px;
+    font-size: 0.9rem;
+    border: 1px solid rgb(35, 46, 63, 0.5);
+    box-sizing: border-box;
+    color: var(--text-color);
+    background-color: rgb(114, 8, 0);
+}
+
+.clear-filters-btn:hover {
+    background-color: rgb(244, 67, 54, 0.5);
+    color: var(--primary-color);
 }
 
 button.diet-filter-tag {
@@ -392,6 +392,39 @@ button.diet-filter-tag.low-fodmap.active,
 }
 /* END OF tag & filter button styles */
 /* --------------------------------- */
+
+/* ----------------------- */
+/* START OF sidebar styles */
+.kitchen-sidebar {
+    position: fixed;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 250px;
+    height: 300px;
+    background-color: var(--text-color);
+    border-radius: 0 10px 10px 0;
+    padding: 1rem;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    color: var(--primary-color);
+    align-content: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.kitchen-sidebar h2,
+.status-text {
+    margin: 0 0 1rem;
+}
+
+.tooltip-content {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    min-height: 35px;
+}
+/* END OF sidebar styles */
+/* --------------------- */
 
 /* ----------------------------- */
 /* START OF recipe detail styles */

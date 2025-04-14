@@ -1,6 +1,13 @@
+import { createSidebar } from "./components/Sidebar.js";
+import { getRecipesByAppliance } from "./services/api/recipeService.js";
+import { renderDietFilter } from "./components/DietFilter.js";
+
 export const initializeKitchen = () => {
     const kitchen = document.querySelector(".kitchen-layout");
     if (!kitchen) return null;
+
+    const sidebar = createSidebar();
+    document.querySelector(".kitchen-container").appendChild(sidebar.element);
 
     let resizeTimeout;
 
@@ -8,7 +15,6 @@ export const initializeKitchen = () => {
         if (!kitchen) return;
 
         const currentWidth = kitchen.offsetWidth;
-
         const scaleRatio = currentWidth / 884;
 
         const elements = [
@@ -64,16 +70,13 @@ export const initializeKitchen = () => {
         });
     };
 
-    // Add sparkles~ ✨
     const addSparkles = (element) => {
         const type = element.className.split(" ")[0];
 
-        // Create sparkle container outside clipped element
         const sparkleContainer = document.createElement("div");
         sparkleContainer.className = `sparkle-container ${type}-sparkles`;
         element.parentNode.appendChild(sparkleContainer);
 
-        // Create sparkles in container
         for (let i = 0; i < 3; i++) {
             const sparkle = document.createElement("span");
             sparkle.className = `sparkle sparkle-${type}`;
@@ -89,6 +92,13 @@ export const initializeKitchen = () => {
             ) {
                 element.style.opacity = "1";
             }
+
+            if (!element.classList.contains("book-aa")) {
+                const type = element.className.split("-")[0];
+                getRecipesByAppliance(type).then((recipes) => {
+                    sidebar.updateTooltip(type, recipes.length);
+                });
+            }
         });
 
         element.addEventListener("mouseleave", () => {
@@ -99,6 +109,8 @@ export const initializeKitchen = () => {
             ) {
                 element.style.opacity = "0";
             }
+
+            sidebar.updateTooltip();
         });
     };
 
@@ -154,6 +166,29 @@ export const initializeKitchen = () => {
     interactiveElements.forEach(addSparkles);
 
     updateKitchenSprite();
+
+    getRecipesByAppliance("").then((recipes) => {
+        if (recipes) {
+            highlightActiveAppliances(recipes);
+
+            const filterContainer = document.getElementById(
+                "diet-filter-container"
+            );
+            if (filterContainer) {
+                getRecipesByAppliance("").then((recipes) => {
+                    if (recipes) {
+                        filterContainer.appendChild(
+                            renderDietFilter(recipes, (filteredRecipes) => {
+                                highlightActiveAppliances(filteredRecipes);
+                            })
+                        );
+                    }
+                });
+            }
+
+            sidebar.setLoadingComplete();
+        }
+    });
 
     window.addEventListener("resize", handleResize);
 
