@@ -63,3 +63,35 @@
         flex: 1 0 100%;
     }
 }
+
+@media print {
+    * {
+        background: none !important;
+        box-shadow: none !important;
+        color: black !important;
+        text-shadow: none !important;
+        border-color: #000 !important;
+    }
+
+    header,
+    .recipes-controls,
+    .print-recipe-btn,
+    .unit-toggle-btn {
+        display: none;
+    }
+
+    img {
+        filter: grayscale(100%);
+    }
+
+    .recipe-details-content {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .recipe-ingredients,
+    .recipe-instructions {
+        page-break-inside: avoid;
+    }
+}

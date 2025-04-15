@@ -7,6 +7,7 @@ import {
     renderEquipmentTags,
     renderDietaryTags,
 } from "../utils/recipeUtils.js";
+import { createPrintButton } from "../components/PDFDownload.js";
 
 let currentRecipe = null;
 
@@ -47,7 +48,7 @@ export const renderRecipeDetails = (recipe) => {
                 </div>
             </div>
         </div>
-
+        ${createPrintButton()}
         <div class="recipe-source">
             <p>Source: <a href="${recipe.source?.url || "#"}" target="_blank">
                 ${recipe.source?.name || recipe.source?.credits || "Unknown"}
