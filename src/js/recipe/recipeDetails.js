@@ -2,7 +2,9 @@ import {
     toggleUnit,
     formatMeasurement,
     getCurrentUnit,
+    convertMeasurementsInText,
 } from "../components/unitConverter.js";
+import { convertTemperature } from "../components/temperatureConverter.js";
 import {
     renderEquipmentTags,
     renderDietaryTags,
@@ -135,14 +137,26 @@ const handleUnitToggle = () => {
     const newUnit = toggleUnit();
     const toggleBtn = document.getElementById("unit-toggle");
     const ingredientsList = document.getElementById("ingredients-list");
+    const instructionsContainer = document.querySelector(
+        ".recipe-instructions"
+    );
 
     if (toggleBtn && ingredientsList) {
         toggleBtn.textContent = `Switch to ${newUnit === "us" ? "Metric" : "US"}`;
 
         if (currentRecipe) {
+            // Update ingredients
             ingredientsList.innerHTML = renderIngredients(
                 currentRecipe.ingredients || currentRecipe.extendedIngredients
             );
+
+            // Update instructions with converted temperatures
+            if (instructionsContainer) {
+                instructionsContainer.innerHTML = `
+                    <h2>Instructions</h2>
+                    ${renderInstructions(currentRecipe.instructions || currentRecipe.analyzedInstructions)}
+                `;
+            }
         } else {
             return "No recipe data available";
         }
@@ -165,11 +179,18 @@ const renderInstructions = (instructions) => {
         return "<p>No instructions available</p>";
     }
 
+    const currentUnit = getCurrentUnit();
+
     if (typeof instructions === "string") {
-        if (instructions.includes("<ol>") || instructions.includes("<ul>")) {
-            return `<div class="instruction-steps">${instructions}</div>`;
+        // Apply both conversions in sequence
+        let convertedText = instructions;
+        convertedText = convertMeasurementsInText(convertedText);
+        convertedText = convertTemperature(convertedText, currentUnit);
+
+        if (convertedText.includes("<ol>") || convertedText.includes("<ul>")) {
+            return `<div class="instruction-steps">${convertedText}</div>`;
         }
-        const steps = instructions.split("\n").filter((step) => step.trim());
+        const steps = convertedText.split("\n").filter((step) => step.trim());
         return `
             <ol class="instruction-steps">
                 ${steps.map((step) => `<li>${step}</li>`).join("")}
@@ -186,13 +207,21 @@ const renderInstructions = (instructions) => {
                 section.name.length > 0 &&
                 !section.name.match(/^(crust|filling|sauce|topping)$/i)
             ) {
-                allSteps.push(section.name);
+                const convertedName = convertTemperature(
+                    convertMeasurementsInText(section.name),
+                    currentUnit
+                );
+                allSteps.push(convertedName);
             }
 
             if (Array.isArray(section.steps)) {
                 section.steps.forEach((step) => {
                     if (step.step) {
-                        allSteps.push(step.step);
+                        const convertedStep = convertTemperature(
+                            convertMeasurementsInText(step.step),
+                            currentUnit
+                        );
+                        allSteps.push(convertedStep);
                     }
                 });
             }
