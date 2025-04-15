@@ -1,9 +1,18 @@
 import {
+    toggleUnit,
+    formatMeasurement,
+    getCurrentUnit,
+} from "../components/unitConverter.js";
+import {
     renderEquipmentTags,
     renderDietaryTags,
 } from "../utils/recipeUtils.js";
 
+let currentRecipe = null;
+
 export const renderRecipeDetails = (recipe) => {
+    currentRecipe = recipe;
+
     if (!recipe || typeof recipe !== "object") {
         return "<div class=\"error\">Recipe details not available</div>";
     }
@@ -47,10 +56,36 @@ export const renderRecipeDetails = (recipe) => {
     `;
 
     // Ingredients
+    const hasConvertibleMeasurements = (ingredients) => {
+        if (!Array.isArray(ingredients)) return false;
+
+        return ingredients.some((ingredient) => {
+            const usUnit = ingredient.measures?.us?.unitShort;
+            const metricUnit = ingredient.measures?.metric?.unitShort;
+
+            return (
+                (usUnit && metricUnit && usUnit !== metricUnit) ||
+                ingredient.measures?.us?.amount !==
+                    ingredient.measures?.metric?.amount
+            );
+        });
+    };
+
     const recipeIngredients = `
         <div class="recipe-ingredients">
-            <h2>Ingredients</h2>
-            <ul>
+            <div class="ingredients-header">
+                <h2>Ingredients</h2>
+                ${
+    hasConvertibleMeasurements(
+        recipe.ingredients || recipe.extendedIngredients
+    )
+        ? `<button id="unit-toggle" class="unit-toggle-btn">
+                           Switch to ${getCurrentUnit() === "us" ? "Metric" : "US"}
+                       </button>`
+        : ""
+}
+            </div>
+            <ul id="ingredients-list">
                 ${renderIngredients(recipe.ingredients || recipe.extendedIngredients)}
             </ul>
         </div>
@@ -88,13 +123,40 @@ const renderIngredients = (ingredients) => {
 
     return ingredients
         .map((ingredient) => {
-            const amount = ingredient.amount || "";
-            const unit = ingredient.unit || "";
+            const { amount, unit } = formatMeasurement(ingredient);
             const name = ingredient.originalName || ingredient.name || "";
-
             return `<li>${amount} ${unit} ${name}</li>`;
         })
         .join("");
+};
+
+const handleUnitToggle = () => {
+    const newUnit = toggleUnit();
+    const toggleBtn = document.getElementById("unit-toggle");
+    const ingredientsList = document.getElementById("ingredients-list");
+
+    if (toggleBtn && ingredientsList) {
+        toggleBtn.textContent = `Switch to ${newUnit === "us" ? "Metric" : "US"}`;
+
+        if (currentRecipe) {
+            ingredientsList.innerHTML = renderIngredients(
+                currentRecipe.ingredients || currentRecipe.extendedIngredients
+            );
+        } else {
+            return "No recipe data available";
+        }
+    }
+};
+
+const setupUnitToggle = () => {
+    const toggleBtn = document.getElementById("unit-toggle");
+
+    if (toggleBtn) {
+        toggleBtn.removeEventListener("click", handleUnitToggle);
+        toggleBtn.addEventListener("click", handleUnitToggle);
+    } else {
+        return "Toggle button not found";
+    }
 };
 
 const renderInstructions = (instructions) => {
@@ -148,3 +210,4 @@ const renderInstructions = (instructions) => {
 };
 
 export default renderRecipeDetails;
+export { setupUnitToggle };

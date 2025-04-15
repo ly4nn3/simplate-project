@@ -10,7 +10,10 @@ import {
     getRecipesByAppliance,
     getRecipeById,
 } from "./services/api/recipeService.js";
-import { renderRecipeDetails } from "./recipe/recipeDetails.js";
+import {
+    renderRecipeDetails,
+    setupUnitToggle,
+} from "./recipe/recipeDetails.js";
 import { renderDietFilter } from "./components/DietFilter.js";
 
 export const router = async (path) => {
@@ -226,6 +229,10 @@ const renderRecipeDetail = async (recipeId, applianceType) => {
             ? effectiveType.charAt(0).toUpperCase() +
               effectiveType.slice(1).toLowerCase()
             : "All";
+
+        setTimeout(() => {
+            setupUnitToggle();
+        }, 0);
 
         return `
             <div class="recipe-detail-page">

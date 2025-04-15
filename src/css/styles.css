@@ -659,6 +659,30 @@ button.diet-filter-tag.low-fodmap.active,
 /* END OF recipe detail styles */
 /* --------------------------- */
 
+/* ------------------------------ */
+/* START OF measure toggle styles */
+.ingredients-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.unit-toggle-btn {
+    padding: 0.5rem 1rem;
+    background: var(--text2-color);
+    border: 1px solid var(--primary-color);
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.unit-toggle-btn:hover {
+    background-color: #f0f0f0;
+}
+/* END OF measure toggle styles */
+/* ---------------------------- */
+
 .wip-container {
     max-width: 600px;
     margin: 0 auto;
