@@ -95,7 +95,7 @@ h2 {
 }
 
 .recipe-count {
-    color: var(--primary-color);
+    color: black;
     font-size: 0.95rem;
 }
 
@@ -348,12 +348,12 @@ button.diet-filter-tag.normal.active,
 
 button.diet-filter-tag.gluten-free.active,
 .diet-tag.gluten-free {
-    background-color: rgb(76, 175, 80, 0.5);
+    background-color: rgb(76, 175, 80, 0.4);
 }
 
 button.diet-filter-tag.keto.active,
 .diet-tag.keto {
-    background-color: rgb(233, 30, 99, 0.5);
+    background-color: rgb(233, 30, 99, 0.3);
 }
 
 button.diet-filter-tag.vegetarian.active,
@@ -363,7 +363,7 @@ button.diet-filter-tag.vegetarian.active,
 
 button.diet-filter-tag.vegan.active,
 .diet-tag.vegan {
-    background-color: rgb(156, 39, 176, 0.4);
+    background-color: rgb(156, 39, 176, 0.3);
 }
 
 button.diet-filter-tag.dairy-free.active,
@@ -373,12 +373,12 @@ button.diet-filter-tag.dairy-free.active,
 
 button.diet-filter-tag.primal.active,
 .diet-tag.primal {
-    background-color: rgba(92, 129, 148, 0.5);
+    background-color: rgba(92, 129, 148, 0.3);
 }
 
 button.diet-filter-tag.paleo.active,
 .diet-tag.paleo {
-    background-color: rgb(121, 85, 72, 0.5);
+    background-color: rgb(121, 85, 72, 0.3);
 }
 
 button.diet-filter-tag.pescatarian.active,
@@ -388,12 +388,12 @@ button.diet-filter-tag.pescatarian.active,
 
 button.diet-filter-tag.whole30.active,
 .diet-tag.whole30 {
-    background-color: rgb(244, 67, 54, 0.5);
+    background-color: rgb(244, 67, 54, 0.4);
 }
 
 button.diet-filter-tag.low-fodmap.active,
 .diet-tag.low-fodmap {
-    background-color: rgb(255, 87, 34, 0.5);
+    background-color: rgb(255, 87, 34, 0.3);
 }
 /* END OF tag & filter button styles */
 /* --------------------------------- */
@@ -658,6 +658,46 @@ button.diet-filter-tag.low-fodmap.active,
 }
 /* END OF recipe detail styles */
 /* --------------------------- */
+
+/* ------------------------------ */
+/* START OF print/save button & measure toggle styles */
+.print-recipe-btn {
+    margin-top: 10px;
+    padding: 8px 16px;
+    background: var(--text2-color);
+    border: 1px solid var(--primary-color);
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.print-recipe-btn:hover {
+    background-color: #f5f5f5;
+    border-color: #999;
+}
+
+.ingredients-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.unit-toggle-btn {
+    padding: 0.5rem 1rem;
+    background: var(--text2-color);
+    border: 1px solid var(--primary-color);
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.unit-toggle-btn:hover {
+    background-color: #f0f0f0;
+}
+/* END OF print/save button & measure toggle styles */
+/* ---------------------------- */
 
 .wip-container {
     max-width: 600px;
