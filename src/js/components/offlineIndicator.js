@@ -1,16 +1,19 @@
 export function initializeOfflineIndicator() {
     const offlineIndicator = document.getElementById("offline-indicator");
 
-    function updateOnlineStatus() {
-        if (!navigator.onLine) {
-            offlineIndicator.classList.remove("hidden");
-        } else {
-            offlineIndicator.classList.add("hidden");
-        }
-    }
+    const updateOnlineStatus = () => {
+        offlineIndicator.classList.toggle("hidden", navigator.onLine);
+    };
 
-    window.addEventListener("online", updateOnlineStatus);
-    window.addEventListener("offline", updateOnlineStatus);
+    const eventOptions = { passive: true };
+
+    window.addEventListener("online", updateOnlineStatus, eventOptions);
+    window.addEventListener("offline", updateOnlineStatus, eventOptions);
 
     updateOnlineStatus();
+
+    return () => {
+        window.removeEventListener("online", updateOnlineStatus);
+        window.removeEventListener("offline", updateOnlineStatus);
+    };
 }

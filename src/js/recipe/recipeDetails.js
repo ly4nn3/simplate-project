@@ -12,232 +12,208 @@ import {
 import { createPrintButton } from "../components/PDFDownload.js";
 
 let currentRecipe = null;
+const conversionCache = new Map();
+const SECTION_NAME_REGEX = /^(crust|filling|sauce|topping)$/i;
 
-export const renderRecipeDetails = (recipe) => {
-    currentRecipe = recipe;
+const createRecipeHeader = ({ title, readyInMinutes, servings, image }) => `
+    <div class="recipe-header">
+        <div class="header-content">
+            <h2>${title}</h2>
+            <div class="recipe-meta">
+                <span>⏲️ ${readyInMinutes}m</span>
+                <span>🍽️ ${servings}</span>
+            </div>
+        </div>
+        <div class="header-image">
+            <img loading="lazy" src="${image}" alt="${title}">
+        </div>
+    </div>`;
 
-    if (!recipe || typeof recipe !== "object") {
-        return "<div class=\"error\">Recipe details not available</div>";
+const createRecipeTagsSection = (recipe) => `
+    <div class="recipe-tags">
+        <div class="tags-group">
+            <div class="tags-content">${renderDietaryTags(recipe)}</div>
+        </div>
+        <div class="tags-group">
+            <div class="tags-content">${renderEquipmentTags(recipe)}</div>
+        </div>
+    </div>
+    ${createPrintButton()}
+    <div class="recipe-source">
+        <p>Source: <a href="${recipe.source?.url || "#"}" target="_blank">
+            ${recipe.source?.name || recipe.source?.credits || "Unknown"}
+        </a></p>
+    </div>`;
+
+const hasConvertibleMeasurements = (ingredients) => {
+    if (!Array.isArray(ingredients)) return false;
+
+    // Check only first few ingredients for performance
+    const checkLimit = Math.min(ingredients.length, 3);
+    for (let i = 0; i < checkLimit; i++) {
+        const measures = ingredients[i].measures;
+        if (
+            measures?.us?.unitShort !== measures?.metric?.unitShort ||
+            measures?.us?.amount !== measures?.metric?.amount
+        ) {
+            return true;
+        }
     }
-
-    // Header
-    const recipeHeader = `
-        <div class="recipe-header">
-            <div class="header-content">
-                <h2>${recipe.title}</h2>
-                <div class="recipe-meta">
-                    <span>⏲️ ${recipe.readyInMinutes} minutes</span>
-                    <span>🍽️ ${recipe.servings} servings</span>
-                </div>
-            </div>
-            <div class="header-image">
-                <img src="${recipe.image}" alt="${recipe.title}">
-            </div>
-        </div>
-    `;
-
-    // Image and tags
-    const recipeTagsSection = `
-        <div class="recipe-tags">
-            <div class="tags-group">
-                <div class="tags-content">
-                    ${renderDietaryTags(recipe)}
-                </div>
-            </div>
-            <div class="tags-group">
-                <div class="tags-content">
-                    ${renderEquipmentTags(recipe)}
-                </div>
-            </div>
-        </div>
-        ${createPrintButton()}
-        <div class="recipe-source">
-            <p>Source: <a href="${recipe.source?.url || "#"}" target="_blank">
-                ${recipe.source?.name || recipe.source?.credits || "Unknown"}
-            </a></p>
-        </div>
-    `;
-
-    // Ingredients
-    const hasConvertibleMeasurements = (ingredients) => {
-        if (!Array.isArray(ingredients)) return false;
-
-        return ingredients.some((ingredient) => {
-            const usUnit = ingredient.measures?.us?.unitShort;
-            const metricUnit = ingredient.measures?.metric?.unitShort;
-
-            return (
-                (usUnit && metricUnit && usUnit !== metricUnit) ||
-                ingredient.measures?.us?.amount !==
-                    ingredient.measures?.metric?.amount
-            );
-        });
-    };
-
-    const recipeIngredients = `
-        <div class="recipe-ingredients">
-            <div class="ingredients-header">
-                <h2>Ingredients</h2>
-                ${
-    hasConvertibleMeasurements(
-        recipe.ingredients || recipe.extendedIngredients
-    )
-        ? `<button id="unit-toggle" class="unit-toggle-btn">
-                           Switch to ${getCurrentUnit() === "us" ? "Metric" : "US"}
-                       </button>`
-        : ""
-}
-            </div>
-            <ul id="ingredients-list">
-                ${renderIngredients(recipe.ingredients || recipe.extendedIngredients)}
-            </ul>
-        </div>
-    `;
-
-    // Instructions
-    const recipeInstructions = `
-        <div class="recipe-instructions">
-            <h2>Instructions</h2>
-            ${renderInstructions(recipe.instructions || recipe.analyzedInstructions)}
-        </div>
-    `;
-
-    // Combined
-    return `
-        <div class="recipe-details-content">
-            ${recipeHeader}
-            
-            <div class="recipe-content">
-                ${recipeTagsSection}
-                
-                <div class="recipe-info">
-                    ${recipeIngredients}
-                    ${recipeInstructions}
-                </div>
-            </div>
-        </div>
-    `;
+    return false;
 };
 
 const renderIngredients = (ingredients) => {
-    if (!Array.isArray(ingredients) || ingredients.length === 0) {
+    if (!Array.isArray(ingredients) || !ingredients.length) {
         return "<li>No ingredients available</li>";
     }
 
-    return ingredients
-        .map((ingredient) => {
-            const { amount, unit } = formatMeasurement(ingredient);
-            const name = ingredient.originalName || ingredient.name || "";
-            return `<li>${amount} ${unit} ${name}</li>`;
-        })
-        .join("");
+    const result = [];
+    for (let i = 0; i < ingredients.length; i++) {
+        const { amount, unit } = formatMeasurement(ingredients[i]);
+        const name = ingredients[i].originalName || ingredients[i].name || "";
+        result.push(`<li>${amount} ${unit} ${name}</li>`);
+    }
+    return result.join("");
 };
 
-const handleUnitToggle = () => {
-    const newUnit = toggleUnit();
-    const toggleBtn = document.getElementById("unit-toggle");
-    const ingredientsList = document.getElementById("ingredients-list");
-    const instructionsContainer = document.querySelector(
-        ".recipe-instructions"
-    );
+const processInstructions = (text, currentUnit) => {
+    const cacheKey = `${text}-${currentUnit}`;
+    let processed = conversionCache.get(cacheKey);
 
-    if (toggleBtn && ingredientsList) {
-        toggleBtn.textContent = `Switch to ${newUnit === "us" ? "Metric" : "US"}`;
-
-        if (currentRecipe) {
-            // Update ingredients
-            ingredientsList.innerHTML = renderIngredients(
-                currentRecipe.ingredients || currentRecipe.extendedIngredients
-            );
-
-            // Update instructions with converted temperatures
-            if (instructionsContainer) {
-                instructionsContainer.innerHTML = `
-                    <h2>Instructions</h2>
-                    ${renderInstructions(currentRecipe.instructions || currentRecipe.analyzedInstructions)}
-                `;
-            }
-        } else {
-            return "No recipe data available";
-        }
+    if (!processed) {
+        processed = convertTemperature(
+            convertMeasurementsInText(text),
+            currentUnit
+        );
+        conversionCache.set(cacheKey, processed);
     }
-};
-
-const setupUnitToggle = () => {
-    const toggleBtn = document.getElementById("unit-toggle");
-
-    if (toggleBtn) {
-        toggleBtn.removeEventListener("click", handleUnitToggle);
-        toggleBtn.addEventListener("click", handleUnitToggle);
-    } else {
-        return "Toggle button not found";
-    }
+    return processed;
 };
 
 const renderInstructions = (instructions) => {
-    if (!instructions) {
-        return "<p>No instructions available</p>";
-    }
+    if (!instructions) return "<p>No instructions available</p>";
 
     const currentUnit = getCurrentUnit();
 
     if (typeof instructions === "string") {
-        // Apply both conversions in sequence
-        let convertedText = instructions;
-        convertedText = convertMeasurementsInText(convertedText);
-        convertedText = convertTemperature(convertedText, currentUnit);
-
+        const convertedText = processInstructions(instructions, currentUnit);
         if (convertedText.includes("<ol>") || convertedText.includes("<ul>")) {
-            return `<div class="instruction-steps">${convertedText}</div>`;
+            return convertedText;
         }
-        const steps = convertedText.split("\n").filter((step) => step.trim());
-        return `
-            <ol class="instruction-steps">
-                ${steps.map((step) => `<li>${step}</li>`).join("")}
-            </ol>
-        `;
+
+        const steps = convertedText
+            .split("\n")
+            .filter((step) => step.trim())
+            .map((step) => `<li>${step}</li>`)
+            .join("");
+        return `<ol class="instruction-steps">${steps}</ol>`;
     }
 
-    if (Array.isArray(instructions) && instructions.length > 0) {
-        const allSteps = [];
+    if (Array.isArray(instructions) && instructions.length) {
+        const steps = [];
 
-        instructions.forEach((section) => {
+        for (const section of instructions) {
             if (
-                section.name &&
-                section.name.length > 0 &&
-                !section.name.match(/^(crust|filling|sauce|topping)$/i)
+                section.name?.length &&
+                !SECTION_NAME_REGEX.test(section.name)
             ) {
-                const convertedName = convertTemperature(
-                    convertMeasurementsInText(section.name),
-                    currentUnit
+                steps.push(
+                    `<li>${processInstructions(section.name, currentUnit)}</li>`
                 );
-                allSteps.push(convertedName);
             }
 
             if (Array.isArray(section.steps)) {
-                section.steps.forEach((step) => {
+                for (const step of section.steps) {
                     if (step.step) {
-                        const convertedStep = convertTemperature(
-                            convertMeasurementsInText(step.step),
-                            currentUnit
+                        steps.push(
+                            `<li>${processInstructions(step.step, currentUnit)}</li>`
                         );
-                        allSteps.push(convertedStep);
                     }
-                });
+                }
             }
-        });
-
-        if (allSteps.length > 0) {
-            return `
-                <ol class="instruction-steps">
-                    ${allSteps.map((step) => `<li>${step}</li>`).join("")}
-                </ol>
-            `;
         }
+
+        return steps.length
+            ? `<ol class="instruction-steps">${steps.join("")}</ol>`
+            : "<p>No instructions available</p>";
     }
 
     return "<p>No instructions available</p>";
 };
 
+export const renderRecipeDetails = (recipe) => {
+    if (!recipe || typeof recipe !== "object") {
+        return "<div class=\"error\">Recipe details not available</div>";
+    }
+
+    currentRecipe = recipe;
+    const ingredients = recipe.ingredients || recipe.extendedIngredients;
+    const showUnitToggle = hasConvertibleMeasurements(ingredients);
+
+    const unitToggleButton = showUnitToggle
+        ? `<button id="unit-toggle" class="unit-toggle-btn">
+            Switch to ${getCurrentUnit() === "us" ? "Metric" : "US"}
+           </button>`
+        : "";
+
+    return `
+        <div class="recipe-details-content">
+            ${createRecipeHeader(recipe)}
+            <div class="recipe-content">
+                ${createRecipeTagsSection(recipe)}
+                <div class="recipe-info">
+                    <div class="recipe-ingredients">
+                        <div class="ingredients-header">
+                            <h2>Ingredients</h2>
+                            ${unitToggleButton}
+                        </div>
+                        <ul id="ingredients-list">${renderIngredients(ingredients)}</ul>
+                    </div>
+                    <div class="recipe-instructions">
+                        <h2>Instructions</h2>
+                        ${renderInstructions(recipe.instructions || recipe.analyzedInstructions)}
+                    </div>
+                </div>
+            </div>
+        </div>`;
+};
+
+const handleUnitToggle = () => {
+    const newUnit = toggleUnit();
+    const elements = {
+        toggleBtn: document.getElementById("unit-toggle"),
+        ingredientsList: document.getElementById("ingredients-list"),
+        instructionsContainer: document.querySelector(".recipe-instructions"),
+    };
+
+    if (!currentRecipe || !elements.toggleBtn || !elements.ingredientsList)
+        return;
+
+    requestAnimationFrame(() => {
+        elements.toggleBtn.textContent = `Switch to ${newUnit === "us" ? "Metric" : "US"}`;
+        elements.ingredientsList.innerHTML = renderIngredients(
+            currentRecipe.ingredients || currentRecipe.extendedIngredients
+        );
+
+        if (elements.instructionsContainer) {
+            elements.instructionsContainer.innerHTML = `
+                <h2>Instructions</h2>
+                ${renderInstructions(currentRecipe.instructions || currentRecipe.analyzedInstructions)}`;
+        }
+    });
+};
+
+export const setupUnitToggle = () => {
+    const toggleBtn = document.getElementById("unit-toggle");
+    if (toggleBtn) {
+        toggleBtn.removeEventListener("click", handleUnitToggle);
+        toggleBtn.addEventListener("click", handleUnitToggle);
+    }
+};
+
+export const cleanup = () => {
+    conversionCache.clear();
+    currentRecipe = null;
+};
+
 export default renderRecipeDetails;
-export { setupUnitToggle };

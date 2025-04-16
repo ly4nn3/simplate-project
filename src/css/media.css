@@ -4,6 +4,12 @@
     }
 }
 
+@media (max-width: 1000px) {
+    .recipe-detail-page {
+        width: 100%;
+    }
+}
+
 @media (max-width: 884px) {
     .offline-indicator span {
         display: none;
@@ -117,6 +123,22 @@
 
     .recipe-meta {
         flex: 1 0 100%;
+    }
+
+    .recipe-detail-page,
+    .recipe-details-content {
+        background-color: #eeece3;
+    }
+
+    .recipe-details-content {
+        padding: 0;
+        background-image: none;
+        box-shadow: none;
+    }
+
+    .print-recipe-btn,
+    .unit-toggle-btn {
+        background-color: #dad5c6;
     }
 }
 

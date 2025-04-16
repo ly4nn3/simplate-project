@@ -1,84 +1,105 @@
 export class RefreshCountdown {
+    #type;
+    #duration;
+    #element;
+    #updateInterval;
+    #storageKey;
+    #messages;
+
     constructor(type, duration) {
-        this.type = type; // 'recipes' or 'books'
-        this.duration = duration;
-        this.element = this.createElement();
-        this.updateInterval = null;
-        this.initializeTimer();
+        this.#type = type;
+        this.#duration = duration;
+        this.#storageKey = type === "recipes" ? "cachedRecipes" : "cachedBooks";
+
+        this.#messages = {
+            recipes: {
+                refresh: "Recipes refresh available!",
+                countdown: "Recipes refresh in: ",
+            },
+            books: {
+                refresh: "There's a new book recommendation!",
+                countdown: "Book recommendation refresh in: ",
+            },
+        };
+
+        this.#element = this.#createElement();
+        this.#initializeTimer();
     }
 
-    createElement() {
+    #createElement() {
         const container = document.createElement("div");
         container.classList.add("refresh-countdown");
-        container.dataset.type = this.type;
+        container.dataset.type = this.#type;
         return container;
     }
 
-    initializeTimer() {
-        this.updateDisplay();
-        this.updateInterval = setInterval(() => this.updateDisplay(), 1000);
+    #initializeTimer() {
+        this.#updateDisplay();
+        this.#updateInterval = setInterval(() => {
+            requestAnimationFrame(() => this.#updateDisplay());
+        }, 1000);
     }
 
-    updateDisplay() {
-        const cached = localStorage.getItem(
-            this.type === "recipes" ? "cachedRecipes" : "cachedBooks"
-        );
+    #formatTime(timeLeft) {
+        const times = [
+            { value: 24 * 60 * 60 * 1000, label: "d" },
+            { value: 60 * 60 * 1000, label: "h" },
+            { value: 60 * 1000, label: "m" },
+            { value: 1000, label: "s" },
+        ];
+
+        let displayText = "";
+        let remaining = timeLeft;
+
+        times.forEach(({ value, label }) => {
+            const amount = Math.floor(remaining / value);
+            if (amount > 0 || displayText) {
+                displayText += `<span class="time-digits">${amount}</span>${label} `;
+            }
+            remaining %= value;
+        });
+
+        return displayText.trim();
+    }
+
+    #updateDisplay() {
+        const cached = localStorage.getItem(this.#storageKey);
 
         if (!cached) {
-            this.element.textContent =
-                this.type === "recipes"
-                    ? "Recipes refresh available!"
-                    : "There's a new book recommendation!";
+            this.#element.textContent = this.#messages[this.#type].refresh;
             return;
         }
 
         const parsedCache = JSON.parse(cached);
-        const timestamp = parsedCache.timestamp;
-        const timeLeft = Math.max(0, this.duration - (Date.now() - timestamp));
+
+        if (this.#type === "books" && !parsedCache.viewed) {
+            this.#element.textContent = this.#messages.books.refresh;
+            return;
+        }
+
+        const timeLeft = Math.max(
+            0,
+            this.#duration - (Date.now() - parsedCache.timestamp)
+        );
 
         if (timeLeft === 0) {
-            this.element.textContent =
-                this.type === "recipes"
-                    ? "Recipes refresh available!"
-                    : "There's a new book recommendation!";
+            this.#element.textContent = this.#messages[this.#type].refresh;
             return;
         }
 
-        if (this.type === "books") {
-            if (!parsedCache.viewed) {
-                this.element.textContent = "There's a new book recommendation!";
-                return;
-            }
-            this.element.innerHTML = `Book recommendation refresh in: ${this.formatTime(timeLeft)}`;
-            return;
-        }
-
-        this.element.innerHTML = `Recipes refresh in: ${this.formatTime(timeLeft)}`;
+        this.#element.innerHTML =
+            this.#messages[this.#type].countdown + this.#formatTime(timeLeft);
     }
 
-    formatTime(timeLeft) {
-        const days = Math.floor(timeLeft / (24 * 60 * 60 * 1000));
-        const hours = Math.floor(
-            (timeLeft % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000)
-        );
-        const minutes = Math.floor((timeLeft % (60 * 60 * 1000)) / (60 * 1000));
-        const seconds = Math.floor((timeLeft % (60 * 1000)) / 1000);
-
-        let displayText = "";
-        if (days > 0)
-            displayText += `<span class="time-digits">${days}</span>d `;
-        if (hours > 0)
-            displayText += `<span class="time-digits">${hours}</span>h `;
-        if (minutes > 0)
-            displayText += `<span class="time-digits">${minutes}</span>m `;
-        displayText += `<span class="time-digits">${seconds}</span>s`;
-
-        return displayText;
+    get element() {
+        return this.#element;
     }
 
     destroy() {
-        if (this.updateInterval) {
-            clearInterval(this.updateInterval);
+        if (this.#updateInterval) {
+            clearInterval(this.#updateInterval);
+            this.#updateInterval = null;
         }
+        this.#element = null;
     }
 }

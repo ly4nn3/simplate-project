@@ -1,6 +1,15 @@
 import { getDailyBook } from "./services/api/bookService.js";
 import { renderBookModal } from "./utils/bookUtils.js";
-import { markBookAsViewed } from "./services/cache/bookCache.js"; // Add this import
+import { markBookAsViewed } from "./services/cache/bookCache.js";
+
+const LOADING_TEMPLATE = `
+    <div class="modal-content book-modal">
+        <button class="modal-close">&times;</button>
+        <div class="loading-container">
+            <div class="loading-message">Loading today's recommendation...</div>
+        </div>
+    </div>
+`;
 
 export const showBookModal = async () => {
     let modalContainer = document.querySelector(".modal-container");
@@ -10,44 +19,48 @@ export const showBookModal = async () => {
         document.body.appendChild(modalContainer);
     }
 
+    const cleanup = setupModalEvents(modalContainer);
+
     try {
-        modalContainer.innerHTML = `
-            <div class="modal-content book-modal">
-                <button class="modal-close">&times;</button>
-                <div class="loading-container">
-                    <div class="loading-message">Loading today's recommendation...</div>
-                </div>
-            </div>
-        `;
+        modalContainer.innerHTML = LOADING_TEMPLATE;
         modalContainer.classList.add("active");
 
         const book = await getDailyBook();
         modalContainer.innerHTML = renderBookModal(book);
-
         markBookAsViewed();
 
-        const closeButton = modalContainer.querySelector(".modal-close");
-        const closeModal = () => {
-            modalContainer.classList.remove("active");
-        };
-
-        closeButton.addEventListener("click", closeModal);
-
-        modalContainer.addEventListener("click", (e) => {
-            if (e.target === modalContainer) {
-                closeModal();
-            }
-        });
-
-        document.addEventListener("keydown", (e) => {
-            if (
-                e.key === "Escape" &&
-                modalContainer.classList.contains("active")
-            ) {
-                closeModal();
-            }
-        });
+        cleanup();
+        setupModalEvents(modalContainer);
     } catch {
-        modalContainer.innerHTML = renderBookModal(null);
+        modalContainer.innerHTML = "Failed to load book recommendation:";
     }
 };
+
+function setupModalEvents(modalContainer) {
+    const closeModal = () => {
+        modalContainer.classList.remove("active");
+    };
+
+    const handleClick = (e) => {
+        if (
+            e.target === modalContainer ||
+            e.target.classList.contains("modal-close")
+        ) {
+            closeModal();
+        }
+    };
+
+    const handleKeydown = (e) => {
+        if (e.key === "Escape" && modalContainer.classList.contains("active")) {
+            closeModal();
+        }
+    };
+
+    modalContainer.addEventListener("click", handleClick);
+    document.addEventListener("keydown", handleKeydown);
+
+    return () => {
+        modalContainer.removeEventListener("click", handleClick);
+        document.removeEventListener("keydown", handleKeydown);
+    };
+}

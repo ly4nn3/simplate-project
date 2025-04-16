@@ -1,6 +1,10 @@
 import { EQUIPMENT_CATEGORIES } from "../../data/equipment-categories.js";
 import { RECIPE_CATEGORIES } from "../../data/recipe-categories.js";
 
+const { hasAsset, general, specialized } = EQUIPMENT_CATEGORIES;
+const { ingredientBased, dishTypes, cookingIndicators, primaryEquipment } =
+    RECIPE_CATEGORIES;
+
 export function categorizeEquipment(equipmentList) {
     if (!Array.isArray(equipmentList)) {
         return {
@@ -19,17 +23,20 @@ export function categorizeEquipment(equipmentList) {
         specialized: [],
     };
 
+    // Sets for lookups
+    const specializedSet = new Set(specialized);
+    const essentialSet = new Set(general.essential);
+    const optionalSet = new Set(general.optional);
+
     equipmentList.forEach((item) => {
         if (!item) return;
 
         const equipment = item.toLowerCase();
-
         let foundInAssets = false;
 
-        for (const { equipment: equipmentList } of Object.values(
-            EQUIPMENT_CATEGORIES.hasAsset
-        )) {
-            if (equipmentList.includes(equipment)) {
+        // asset categories
+        for (const category of Object.values(hasAsset)) {
+            if (category.equipment.includes(equipment)) {
                 categorized.display.push(equipment);
                 foundInAssets = true;
                 break;
@@ -37,13 +44,11 @@ export function categorizeEquipment(equipmentList) {
         }
 
         if (!foundInAssets) {
-            if (EQUIPMENT_CATEGORIES.general.essential.includes(equipment)) {
+            if (essentialSet.has(equipment)) {
                 categorized.required.push(equipment);
-            } else if (
-                EQUIPMENT_CATEGORIES.general.optional.includes(equipment)
-            ) {
+            } else if (optionalSet.has(equipment)) {
                 categorized.optional.push(equipment);
-            } else if (EQUIPMENT_CATEGORIES.specialized.includes(equipment)) {
+            } else if (specializedSet.has(equipment)) {
                 categorized.specialized.push(equipment);
             }
         }
@@ -60,27 +65,24 @@ export function identifyPrimaryEquipment(recipe) {
 
     const steps = recipe.analyzedInstructions[0].steps;
 
-    // Check ingredients first
-    const primaryFromIngredients = checkIngredientBasedCategory(recipe);
-    if (primaryFromIngredients) return primaryFromIngredients;
-
-    // Check cooking methods
-    const primaryFromMethod = checkCookingMethod(steps);
-    if (primaryFromMethod) return primaryFromMethod;
-
-    // Check specific equipment
-    return checkSpecificEquipment(steps);
+    return (
+        checkIngredientBasedCategory(recipe) ||
+        checkCookingMethod(steps) ||
+        checkSpecificEquipment(steps)
+    );
 }
 
 function checkIngredientBasedCategory(recipe) {
     const ingredients = recipe.extendedIngredients || [];
+    const title = recipe.title?.toLowerCase() || "";
 
-    for (const ingredient of ingredients) {
-        const ingredientName = ingredient.name.toLowerCase();
-        const originalDesc = ingredient.original.toLowerCase();
+    // ingredients
+    for (const { name, original } of ingredients) {
+        const ingredientName = name.toLowerCase();
+        const originalDesc = original.toLowerCase();
 
         if (
-            RECIPE_CATEGORIES.ingredientBased.oven.some(
+            ingredientBased.oven.some(
                 (term) =>
                     ingredientName.includes(term) ||
                     originalDesc.includes("in the oven")
@@ -90,29 +92,18 @@ function checkIngredientBasedCategory(recipe) {
         }
 
         if (
-            RECIPE_CATEGORIES.ingredientBased.stove.some((term) =>
-                ingredientName.includes(term)
-            )
+            ingredientBased.stove.some((term) => ingredientName.includes(term))
         ) {
             return "stove";
         }
     }
 
-    if (
-        recipe.title &&
-        RECIPE_CATEGORIES.dishTypes.microwave?.some((term) =>
-            recipe.title.toLowerCase().includes(term)
-        )
-    ) {
+    // title
+    if (dishTypes.microwave?.some((term) => title.includes(term))) {
         return "microwave";
     }
 
-    if (
-        recipe.title &&
-        RECIPE_CATEGORIES.dishTypes.oven.some((term) =>
-            recipe.title.toLowerCase().includes(term)
-        )
-    ) {
+    if (dishTypes.oven.some((term) => title.includes(term))) {
         return "oven";
     }
 
@@ -124,28 +115,28 @@ function checkCookingMethod(steps) {
         .map((step) => step.step.toLowerCase())
         .join(" ");
 
+    // microwave first
     if (
-        RECIPE_CATEGORIES.cookingIndicators.microwave.some((indicator) =>
+        cookingIndicators.microwave.some((indicator) =>
             fullInstructions.includes(indicator)
         )
     ) {
         return "microwave";
     }
 
-    for (const [appliance, indicators] of Object.entries(
-        RECIPE_CATEGORIES.cookingIndicators
-    )) {
+    // other appliances
+    for (const [appliance, indicators] of Object.entries(cookingIndicators)) {
         if (appliance === "microwave") continue;
 
         if (
             indicators.some((indicator) => fullInstructions.includes(indicator))
         ) {
             if (appliance === "board") {
-                const hasOven = RECIPE_CATEGORIES.cookingIndicators.oven.some(
-                    (i) => fullInstructions.includes(i)
+                const hasOven = cookingIndicators.oven.some((i) =>
+                    fullInstructions.includes(i)
                 );
-                const hasStove = RECIPE_CATEGORIES.cookingIndicators.stove.some(
-                    (i) => fullInstructions.includes(i)
+                const hasStove = cookingIndicators.stove.some((i) =>
+                    fullInstructions.includes(i)
                 );
 
                 if (hasOven || hasStove) continue;
@@ -157,20 +148,14 @@ function checkCookingMethod(steps) {
 }
 
 function checkSpecificEquipment(steps) {
-    const equipmentMentioned = new Set();
+    const equipmentMentioned = new Set(
+        steps.flatMap(
+            (step) => step.equipment?.map((eq) => eq.name.toLowerCase()) || []
+        )
+    );
 
-    steps.forEach((step) => {
-        if (step.equipment) {
-            step.equipment.forEach((eq) => {
-                equipmentMentioned.add(eq.name.toLowerCase());
-            });
-        }
-    });
-
-    // Check equipment first (exclude board)
-    for (const [appliance, equipmentList] of Object.entries(
-        RECIPE_CATEGORIES.primaryEquipment
-    )) {
+    // non-board first
+    for (const [appliance, equipmentList] of Object.entries(primaryEquipment)) {
         if (
             appliance !== "board" &&
             equipmentList.some((eq) => equipmentMentioned.has(eq))
@@ -179,14 +164,8 @@ function checkSpecificEquipment(steps) {
         }
     }
 
-    // Check board last
-    if (
-        RECIPE_CATEGORIES.primaryEquipment.board.some((eq) =>
-            equipmentMentioned.has(eq)
-        )
-    ) {
-        return "board";
-    }
-
-    return null;
+    // board last
+    return primaryEquipment.board.some((eq) => equipmentMentioned.has(eq))
+        ? "board"
+        : null;
 }
