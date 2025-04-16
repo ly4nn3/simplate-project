@@ -1,5 +1,6 @@
 import { getDailyBook } from "./services/api/bookService.js";
 import { renderBookModal } from "./utils/bookUtils.js";
+import { markBookAsViewed } from "./services/cache/bookCache.js"; // Add this import
 
 export const showBookModal = async () => {
     let modalContainer = document.querySelector(".modal-container");
@@ -22,6 +23,8 @@ export const showBookModal = async () => {
 
         const book = await getDailyBook();
         modalContainer.innerHTML = renderBookModal(book);
+
+        markBookAsViewed();
 
         const closeButton = modalContainer.querySelector(".modal-close");
         const closeModal = () => {

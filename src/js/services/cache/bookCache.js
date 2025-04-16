@@ -35,6 +35,7 @@ export function cacheResponse(data) {
         const cacheData = {
             data,
             timestamp: Date.now(),
+            viewed: false,
         };
 
         localStorage.setItem(CACHE_KEYS.BOOKS, JSON.stringify(cacheData));
@@ -42,5 +43,18 @@ export function cacheResponse(data) {
     } catch {
         localStorage.removeItem(CACHE_KEYS.BOOKS);
         return false;
+    }
+}
+
+export function markBookAsViewed() {
+    try {
+        const cached = localStorage.getItem(CACHE_KEYS.BOOKS);
+        if (cached) {
+            const parsedCache = JSON.parse(cached);
+            parsedCache.viewed = true;
+            localStorage.setItem(CACHE_KEYS.BOOKS, JSON.stringify(parsedCache));
+        }
+    } catch {
+        return null;
     }
 }
