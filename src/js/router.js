@@ -20,7 +20,6 @@ const ROUTES = {
     "/": "Kitchen",
     "/recipes": "Recipes",
     "/book": "Book",
-    "/documentation": "Documentation",
 };
 
 const ERROR_TEMPLATE = (message, applianceType = "") => `
