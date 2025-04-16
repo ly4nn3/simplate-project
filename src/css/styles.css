@@ -19,6 +19,7 @@ body {
 }
 
 header {
+    display: flex;
     position: relative;
     padding: 1rem;
     background-color: var(--primary-color);
@@ -40,6 +41,8 @@ h2 {
 }
 
 footer {
+    position: anchor;
+    bottom: 0;
     text-align: center;
     text-decoration: none;
     color: var(--text-color);
@@ -80,6 +83,46 @@ footer .book,
     border: 1px solid var(--primary-color);
     box-shadow: 0 2px 8px rgba(207, 148, 33, 0.4);
     color: var(--primary-color);
+}
+
+/* Refresh countdown */
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.header-right {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-end;
+    text-align: right;
+    margin-left: auto;
+}
+
+.refresh-countdown {
+    font-size: 0.9rem;
+    color: var(--text-color);
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255, 0.1);
+    transition: background-color 0.3s ease;
+    text-align: right;
+}
+
+.refresh-countdown .time-digits {
+    font-family: "Courier New", monospace;
+    font-feature-settings: "tnum";
+    font-variant-numeric: tabular-nums;
+}
+
+.refresh-countdown:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.refresh-countdown[data-type="books"] {
+    color: var(--text-color);
 }
 
 /* Offline indicator */
@@ -218,7 +261,7 @@ footer .book,
 .diet-filter {
     position: fixed;
     text-align: center;
-    right: -290px;
+    right: -295px;
     top: 50%;
     transform: translateY(-50%);
     width: 300px;
@@ -465,10 +508,23 @@ button.diet-filter-tag.low-fodmap.active,
     margin: 0 0 1rem;
 }
 
+.status-text {
+    text-decoration: dotted underline;
+    text-underline-offset: 5px;
+}
+
 .tooltip-content {
+    height: 50px;
     margin-top: 1rem;
     font-size: 0.9rem;
     min-height: 35px;
+    background-color: rgb(218, 213, 198, 0.5);
+    border: 1px solid var(--accent-color);
+    border-radius: 5px;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 /* END OF sidebar styles */
 /* --------------------- */
