@@ -26,7 +26,7 @@ export const router = async (path) => {
         "/": "Kitchen",
         "/recipes": recipeId ? "RecipeDetail" : "Recipes",
         "/book": "Book",
-        "/about": "About",
+        "/documentation": "Documentation",
     };
 
     const view = routes[basePath] || routes["/"];
@@ -81,7 +81,6 @@ export const router = async (path) => {
             history.pushState({}, "", "/");
             break;
         case "About":
-            app.innerHTML = await renderAbout();
             break;
         default:
             app.innerHTML = await renderKitchen();
@@ -254,13 +253,4 @@ const renderRecipeDetail = async (recipeId, applianceType) => {
             </div>
         `;
     }
-};
-
-// About view
-const renderAbout = async () => {
-    return `
-        <div class="about">
-            <h1>About Simplate</h1>
-        </div>
-    `;
 };

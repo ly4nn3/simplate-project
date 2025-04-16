@@ -19,12 +19,14 @@ body {
 }
 
 header {
-    margin: 1rem;
+    position: relative;
     padding: 1rem;
+    background-color: var(--primary-color);
+    z-index: 4;
 }
 
 header img {
-    max-width: 400px;
+    max-width: 300px;
     width: 100%;
 }
 
@@ -37,7 +39,20 @@ h2 {
     font-family: var(--font-h2);
 }
 
-.book,
+footer {
+    text-align: center;
+    text-decoration: none;
+    color: var(--text-color);
+    padding: 1rem;
+    font-size: 0.9rem;
+}
+
+footer a {
+    color: var(--text-color);
+    text-underline-offset: 5px;
+}
+
+footer .book,
 .recipes {
     padding: 20px;
     text-align: center;
@@ -65,6 +80,32 @@ h2 {
     border: 1px solid var(--primary-color);
     box-shadow: 0 2px 8px rgba(207, 148, 33, 0.4);
     color: var(--primary-color);
+}
+
+/* Offline indicator */
+.offline-indicator {
+    position: sticky;
+    top: 0;
+    width: 100%;
+    transform: translateX(-50%);
+    background-color: #ffff8e;
+    color: var(--primary-color);
+    font-size: 1.2rem;
+    text-align: center;
+    padding: 0.5rem;
+    z-index: 3;
+    transition: all 0.5s ease-in-out;
+    opacity: 1;
+    transform: translateY(0);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 0 0 20px 20px;
+}
+
+.hidden {
+    opacity: 0;
+    transform: translateY(-100%);
 }
 
 /* --------------------------- */
@@ -402,7 +443,6 @@ button.diet-filter-tag.low-fodmap.active,
 /* START OF sidebar styles */
 .kitchen-sidebar {
     position: fixed;
-    left: 0;
     top: 50%;
     transform: translateY(-50%);
     width: 250px;
@@ -416,6 +456,8 @@ button.diet-filter-tag.low-fodmap.active,
     align-content: center;
     justify-content: center;
     text-align: center;
+    transform: translateY(-50%) translateX(0);
+    transition: transform 0.3s ease-in-out;
 }
 
 .kitchen-sidebar h2,
