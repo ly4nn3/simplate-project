@@ -4,53 +4,58 @@ import {
     identifyPrimaryEquipment,
 } from "./equipmentUtils.js";
 
-export function processRecipe(recipe) {
-    if (!recipe || typeof recipe !== "object") {
-        throw new Error("Invalid recipe data");
+const DEFAULT_RECIPE = {
+    id: 0,
+    title: "",
+    readyInMinutes: 0,
+    servings: 0,
+    source: {
+        url: "",
+        name: "",
+        credits: "",
+        license: "",
+    },
+};
+
+const BOOLEAN_TO_DIET = {
+    glutenFree: "gluten free",
+    dairyFree: "dairy free",
+    vegan: "vegan",
+    vegetarian: "lacto ovo vegetarian",
+    lowFodmap: "fodmap friendly",
+};
+
+// Image processing
+function processImageUrl(url) {
+    if (!url) return "";
+    if (!url.match(/\.(jpg|jpeg|png|gif)$/i)) {
+        return url.endsWith(".") ? `${url}jpg` : `${url}.jpg`;
     }
+    return url;
+}
 
-    let imageUrl = recipe.image || "";
-
-    if (
-        imageUrl &&
-        (imageUrl.endsWith(".") || !imageUrl.match(/\.(jpg|jpeg|png|gif)$/i))
-    ) {
-        imageUrl = imageUrl.endsWith(".")
-            ? `${imageUrl}jpg`
-            : `${imageUrl}.jpg`;
-    }
-
+// Equipment processing
+function extractEquipment(recipe) {
     const equipmentFound = new Set();
 
-    if (recipe.analyzedInstructions?.length > 0) {
-        recipe.analyzedInstructions.forEach((instruction) => {
-            instruction.steps?.forEach((step) => {
-                step.equipment?.forEach((item) => {
-                    if (item?.name) {
-                        equipmentFound.add(item.name.toLowerCase());
-                    }
-                });
+    recipe.analyzedInstructions?.forEach((instruction) => {
+        instruction.steps?.forEach((step) => {
+            step.equipment?.forEach((item) => {
+                if (item?.name) equipmentFound.add(item.name.toLowerCase());
             });
         });
-    }
+    });
 
-    const equipment = {
+    return {
         ...categorizeEquipment(Array.from(equipmentFound)),
         primary: identifyPrimaryEquipment(recipe) || null,
     };
+}
 
-    const dietary = {
-        glutenFree: Boolean(recipe.glutenFree),
-        dairyFree: Boolean(recipe.dairyFree),
-        vegan: Boolean(recipe.vegan),
-        vegetarian: Boolean(recipe.vegetarian),
-        lowFodmap: Boolean(recipe.lowFodmap),
-        diets:
-            recipe.diets && recipe.diets.length > 0 ? recipe.diets : ["normal"],
-    };
-
-    const ingredients =
-        recipe.extendedIngredients
+// Ingredient processing
+function processIngredients(ingredients) {
+    return (
+        ingredients
             ?.map((ingredient) => {
                 if (!ingredient) return null;
                 return {
@@ -63,218 +68,194 @@ export function processRecipe(recipe) {
                     },
                 };
             })
-            .filter(Boolean) || [];
+            .filter(Boolean) || []
+    );
+}
+
+// Main recipe processing
+export function processRecipe(recipe) {
+    if (!recipe || typeof recipe !== "object") {
+        throw new Error("Invalid recipe data");
+    }
 
     return {
-        id: recipe.id || 0,
-        title: recipe.title || "",
-        image: imageUrl || "",
-        readyInMinutes: recipe.readyInMinutes || 0,
-        servings: recipe.servings || 0,
-        source: {
-            url: recipe.sourceUrl || "",
-            name: recipe.sourceName || "",
-            credits: recipe.creditsText || "",
-            license: recipe.license || "",
+        ...DEFAULT_RECIPE,
+        ...recipe,
+        image: processImageUrl(recipe.image),
+        equipment: extractEquipment(recipe),
+        ingredients: processIngredients(recipe.extendedIngredients),
+        dietary: {
+            glutenFree: Boolean(recipe.glutenFree),
+            dairyFree: Boolean(recipe.dairyFree),
+            vegan: Boolean(recipe.vegan),
+            vegetarian: Boolean(recipe.vegetarian),
+            lowFodmap: Boolean(recipe.lowFodmap),
+            diets: recipe.diets?.length > 0 ? recipe.diets : ["normal"],
         },
-        dietary,
-        equipment,
-        ingredients,
-        instructions: recipe.instructions || "",
-        analyzedInstructions: recipe.analyzedInstructions,
     };
 }
 
+// Recipe filtering
 export function filterRecipesByDiet(recipes, selectedDiets) {
-    if (!Array.isArray(recipes) || !Array.isArray(selectedDiets)) {
-        return [];
-    }
+    if (!Array.isArray(recipes) || !Array.isArray(selectedDiets)) return [];
 
-    return recipes.filter((recipe) => {
-        if (!recipe?.dietary) return false;
-
-        return selectedDiets.every((diet) => {
-            if (diet in recipe.dietary) {
-                return recipe.dietary[diet] === true;
-            }
-
-            return recipe.dietary.diets.includes(diet.toLowerCase());
-        });
-    });
+    return recipes.filter(
+        (recipe) =>
+            recipe?.dietary &&
+            selectedDiets.every((diet) =>
+                diet in recipe.dietary
+                    ? recipe.dietary[diet] === true
+                    : recipe.dietary.diets.includes(diet.toLowerCase())
+            )
+    );
 }
 
 export function getAllDiets(recipe) {
     if (!recipe?.dietary) return [];
 
-    const diets = [...recipe.dietary.diets];
-
-    Object.entries(recipe.dietary).forEach(([key, value]) => {
-        if (key !== "diets" && value === true) {
-            diets.push(key.toLowerCase());
-        }
-    });
-
-    return diets;
+    return [
+        ...recipe.dietary.diets,
+        ...Object.entries(recipe.dietary)
+            .filter(([key, value]) => key !== "diets" && value === true)
+            .map(([key]) => key.toLowerCase()),
+    ];
 }
 
+// Categorization
 export function categorizeRecipesByEquipment(recipes) {
     if (!Array.isArray(recipes)) return {};
 
-    const categorized = {
-        stove: [],
-        oven: [],
-        microwave: [],
-        board: [],
-        ricecooker: [],
-        specialized: [],
-        basic: [],
-    };
+    return recipes.reduce(
+        (categories, recipe) => {
+            const category = recipe.equipment.primary
+                ? recipe.equipment.primary
+                : recipe.equipment.hasSpecializedEquipment
+                    ? "specialized"
+                    : "basic";
 
-    recipes.forEach((recipe) => {
-        if (recipe.equipment.primary) {
-            categorized[recipe.equipment.primary].push(recipe);
-        } else if (recipe.equipment.hasSpecializedEquipment) {
-            categorized.specialized.push(recipe);
-        } else {
-            categorized.basic.push(recipe);
+            categories[category] = [...(categories[category] || []), recipe];
+            return categories;
+        },
+        {
+            stove: [],
+            oven: [],
+            microwave: [],
+            board: [],
+            ricecooker: [],
+            specialized: [],
+            basic: [],
         }
-    });
-
-    return categorized;
+    );
 }
 
+// Recipe randomizer
 export const getRandomRecipes = (recipes, count = 6) => {
-    if (!Array.isArray(recipes) || recipes.length === 0) {
-        return [];
-    }
-
-    const shuffled = [...recipes].sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, Math.min(count, shuffled.length));
+    if (!Array.isArray(recipes) || recipes.length === 0) return [];
+    return [...recipes]
+        .sort(() => 0.5 - Math.random())
+        .slice(0, Math.min(count, recipes.length));
 };
 
+// Display management
 export const getDisplayedRecipes = (allRecipes, applianceType) => {
-    if (!Array.isArray(allRecipes) || allRecipes.length === 0) {
-        return [];
-    }
+    if (!Array.isArray(allRecipes) || allRecipes.length === 0) return [];
 
     const storageKey = `displayed_${applianceType}_recipes`;
-    let displayedRecipes;
 
     try {
-        const storedRecipeIds = localStorage.getItem(storageKey);
+        const storedIds = JSON.parse(localStorage.getItem(storageKey) || "[]");
+        let displayedRecipes = allRecipes.filter((recipe) =>
+            storedIds.includes(recipe.id)
+        );
 
-        if (storedRecipeIds) {
-            const ids = JSON.parse(storedRecipeIds);
-            displayedRecipes = allRecipes.filter((recipe) =>
-                ids.includes(recipe.id)
-            );
-
-            if (displayedRecipes.length < Math.min(6, allRecipes.length)) {
-                displayedRecipes = getRandomRecipes(allRecipes);
-                localStorage.setItem(
-                    storageKey,
-                    JSON.stringify(displayedRecipes.map((r) => r.id))
-                );
-            }
-        } else {
+        if (displayedRecipes.length < Math.min(6, allRecipes.length)) {
             displayedRecipes = getRandomRecipes(allRecipes);
             localStorage.setItem(
                 storageKey,
                 JSON.stringify(displayedRecipes.map((r) => r.id))
             );
         }
-    } catch {
-        displayedRecipes = getRandomRecipes(allRecipes);
-    }
 
-    return displayedRecipes;
+        return displayedRecipes;
+    } catch {
+        return getRandomRecipes(allRecipes);
+    }
 };
 
 export const updateDisplayedRecipes = (allRecipes, applianceType) => {
-    if (!Array.isArray(allRecipes) || allRecipes.length === 0) {
-        return [];
-    }
+    if (!Array.isArray(allRecipes) || allRecipes.length === 0) return [];
 
-    const storageKey = `displayed_${applianceType}_recipes`;
     const newRecipes = getRandomRecipes(allRecipes);
-
     try {
         localStorage.setItem(
-            storageKey,
+            `displayed_${applianceType}_recipes`,
             JSON.stringify(newRecipes.map((r) => r.id))
         );
+        return newRecipes;
     } catch {
         return [];
     }
-
-    return newRecipes;
 };
 
+// Rendering
 export const renderDietaryTags = (recipe, compact = false) => {
-    if (!recipe || !recipe.dietary) return "";
+    if (!recipe?.dietary) return "";
 
-    const dietTags = new Set();
+    const dietTags = new Set(
+        [
+            ...Object.entries(recipe.dietary)
+                .filter(
+                    ([key, value]) => value === true && BOOLEAN_TO_DIET[key]
+                )
+                .map(([key]) => BOOLEAN_TO_DIET[key]),
+            ...(recipe.dietary.diets || []).map((diet) => diet.toLowerCase()),
+        ]
+            .map((dietKey) =>
+                DIET_CATEGORIES[dietKey]
+                    ? `<span class="diet-tag ${DIET_CATEGORIES[dietKey].className}">
+                ${DIET_CATEGORIES[dietKey].display}
+               </span>`
+                    : null
+            )
+            .filter(Boolean)
+    );
 
-    const booleanToDietKey = {
-        glutenFree: "gluten free",
-        dairyFree: "dairy free",
-        vegan: "vegan",
-        vegetarian: "lacto ovo vegetarian",
-        lowFodmap: "fodmap friendly",
-    };
-
-    const allDiets = new Set([
-        ...Object.entries(recipe.dietary)
-            .filter(([key, value]) => value === true && booleanToDietKey[key])
-            .map(([key]) => booleanToDietKey[key]),
-        ...(recipe.dietary.diets || []).map((diet) => diet.toLowerCase()),
-    ]);
-
-    allDiets.forEach((dietKey) => {
-        if (DIET_CATEGORIES[dietKey]) {
-            dietTags.add(
-                `<span class="diet-tag ${DIET_CATEGORIES[dietKey].className}">
-                    ${DIET_CATEGORIES[dietKey].display}
-                </span>`
-            );
-        }
-    });
-
-    if (compact) {
-        return Array.from(dietTags).join("");
-    }
-
-    return dietTags.size > 0
-        ? `<div class="dietary-tags">${Array.from(dietTags).join("")}</div>`
-        : "";
+    return compact
+        ? Array.from(dietTags).join("")
+        : dietTags.size > 0
+            ? `<div class="dietary-tags">${Array.from(dietTags).join("")}</div>`
+            : "";
 };
 
 export const renderEquipmentTags = (recipe) => {
-    if (!recipe || !recipe.equipment) {
-        return "";
+    if (!recipe?.equipment) return "";
+
+    const tags = [];
+
+    if (recipe.equipment.primary) {
+        tags.push(
+            `<span class="equipment-tag primary">${recipe.equipment.primary}</span>`
+        );
     }
 
-    const primary = recipe.equipment.primary
-        ? `<span class="equipment-tag primary">${recipe.equipment.primary}</span>`
-        : "";
+    if (Array.isArray(recipe.equipment.display)) {
+        tags.push(
+            ...recipe.equipment.display
+                .filter((item) => item !== recipe.equipment.primary)
+                .map((item) => `<span class="equipment-tag">${item}</span>`)
+        );
+    }
 
-    const display = Array.isArray(recipe.equipment.display)
-        ? recipe.equipment.display
-            .filter((item) => item !== recipe.equipment.primary)
-            .map((item) => `<span class="equipment-tag">${item}</span>`)
-            .join("")
-        : "";
-
-    const specialized = Array.isArray(recipe.equipment.specialized)
-        ? recipe.equipment.specialized
-            .map(
+    if (Array.isArray(recipe.equipment.specialized)) {
+        tags.push(
+            ...recipe.equipment.specialized.map(
                 (item) =>
                     `<span class="equipment-tag specialized">⚠️ ${item}</span>`
             )
-            .join("")
-        : "";
+        );
+    }
 
-    return `${primary}${display}${specialized}`;
+    return tags.join("");
 };
 
 export const renderRecipeCards = (recipes) => {
@@ -285,23 +266,29 @@ export const renderRecipeCards = (recipes) => {
     return recipes
         .map(
             (recipe) => `
-            <div class="recipe-card" data-navigate="/recipes?id=${recipe.id}">
-                <img src="${recipe.image}" alt="${recipe.title}" width="350" height="auto">
-                <div class="recipe-card-content">
-                    <h3>${recipe.title}</h3>
-                    <div class="recipe-meta">
-                        <span>⏲️ ${recipe.readyInMinutes} minutes</span>
-                        <span>🍽️ ${recipe.servings} servings</span>
-                    </div>
-                    <div class="recipe-equipment">
-                        ${renderEquipmentTags(recipe)}
-                    </div>
-                    <div class="recipe-dietary-tags">
-                        ${renderDietaryTags(recipe, true)}
-                    </div>
+        <div class="recipe-card" data-navigate="/recipes?id=${recipe.id}">
+            <img 
+                src="${recipe.image}" 
+                alt="${recipe.title}" 
+                width="350" 
+                height="auto"
+                loading="lazy"
+            >
+            <div class="recipe-card-content">
+                <h3>${recipe.title}</h3>
+                <div class="recipe-meta">
+                    <span>⏲️ ${recipe.readyInMinutes} minutes</span>
+                    <span>🍽️ ${recipe.servings} servings</span>
+                </div>
+                <div class="recipe-equipment">
+                    ${renderEquipmentTags(recipe)}
+                </div>
+                <div class="recipe-dietary-tags">
+                    ${renderDietaryTags(recipe, true)}
                 </div>
             </div>
-        `
+        </div>
+    `
         )
         .join("");
 };

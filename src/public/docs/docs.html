@@ -1,0 +1,203 @@
+<h1 id="simplate-project">Simplate Project</h1>
+<p>
+    A recipe hub website built with vanilla JavaScript, featuring an interactive
+    kitchen interface where users can explore recipes based on different cooking
+    appliances. The project uses modern web technologies and a sprite-based
+    approach for smooth interactions.
+</p>
+<p>
+    <img src="/assets/images/logo-black.svg" alt="Simplate Logo Black" />
+    <img src="/assets/images/logo-white.svg" alt="Simplate Logo White" />
+</p>
+<h2 id="development-setup">Development Setup</h2>
+<ol>
+    <li>
+        Clone the repository:
+        <pre><code class="lang-bash">git <span class="hljs-keyword">clone</span> <span class="hljs-title">https</span>://github.com/ly4nn3/simplate-project.git
+</code></pre>
+    </li>
+    <li>
+        Install dependencies:
+        <pre><code class="lang-bash">npm <span class="hljs-keyword">install</span>
+</code></pre>
+    </li>
+    <li>
+        Run development server
+        <pre><code class="lang-bash">npm <span class="hljs-keyword">run</span><span class="bash"> dev</span>
+</code></pre>
+    </li>
+    <li>
+        Create a <code>.env</code> file in the root directory:
+        <pre><code class="lang-bash"><span class="hljs-attr">VITE_SPOONACULAR</span>=your_api_key
+<span class="hljs-attr">VITE_BIGBOOK</span>=your_api_key
+</code></pre>
+    </li>
+    <li>
+        Note: You&#39;ll need a Spoonacular API key to fetch recipe data. Get
+        one at <a href="https://spoonacular.com/food-api">Spoonacular</a>. And a
+        BigBook API key to fetch book recommendations. Get one at
+        <a href="https://bigbookapi.com/">BigBookAPI</a>,
+    </li>
+</ol>
+<h2 id="environment-variables">Environment Variables</h2>
+<ul>
+    <li><code>VITE_SPOONACULAR</code> - Spoonacular API key</li>
+    <li><code>VITE_BIGBOOK</code> - BigBook API key</li>
+</ul>
+<h2 id="available-scripts">Available Scripts</h2>
+<ul>
+    <li><code>npm run dev</code> - Start development server</li>
+    <li><code>npm run build</code> - Build for production</li>
+    <li><code>npm run preview</code> - Preview production build</li>
+    <li><code>npm run lint</code> - Check code quality</li>
+    <li><code>npm run format</code> - Format code</li>
+</ul>
+<h2 id="routes">Routes</h2>
+<ul>
+    <li><code>/</code> - Kitchen view (home)</li>
+    <li><code>/recipes?type=oven</code> - Oven recipes</li>
+    <li><code>/recipes?type=stove</code> - Stovetop recipes</li>
+    <li><code>/recipes?type=microwave</code> - Microwave recipes</li>
+    <li><code>/recipes?type=ricecooker</code> - Rice cooker recipes</li>
+    <li><code>/recipes?type=board</code> - Cutting board recipes</li>
+    <li><code>/book</code> - Cookbook recommendation</li>
+    <li><code>/documentation</code> - Documentation page</li>
+</ul>
+<h2 id="features">Features</h2>
+<h3 id="interactive-kitchen-layout">Interactive Kitchen Layout</h3>
+<ul>
+    <li>Clickable kitchen appliances with hover effects</li>
+    <li>Sparkle animations (✨) for interactive elements</li>
+    <li>Isometric design with active state indicators</li>
+    <li>Smooth transitions and visual feedback</li>
+</ul>
+<h3 id="interactive-elements">Interactive Elements</h3>
+<ul>
+    <li>Oven</li>
+    <li>Stove</li>
+    <li>Microwave</li>
+    <li>Rice Cooker</li>
+    <li>Cutting Board</li>
+    <li>Recipe Book</li>
+</ul>
+<h3 id="recipe-features">Recipe Features</h3>
+<ul>
+    <li>Integration with Spoonacular API</li>
+    <li>Smart appliance detection</li>
+    <li>Recipe categorization</li>
+    <li>Local caching system</li>
+    <li>Dietary information tags</li>
+    <li>Random recipe selection</li>
+    <li>Detailed recipe views</li>
+    <li>Unit conversion (US/Metric)</li>
+    <li>Temperature conversion (F/C)</li>
+</ul>
+<h3 id="user-interface">User Interface</h3>
+<ul>
+    <li>Responsive design</li>
+    <li>Dietary preference filters</li>
+    <li>Recipe card layout</li>
+    <li>Interactive modals</li>
+    <li>Loading states</li>
+    <li>Offline indicators</li>
+    <li>Cache refresh countdown</li>
+</ul>
+<h3 id="navigation">Navigation</h3>
+<ul>
+    <li>Client-side routing system</li>
+    <li>Smooth transitions between views</li>
+    <li>Maintains browser history</li>
+    <li>Query parameter support</li>
+</ul>
+<h3 id="recipe-integration">Recipe Integration</h3>
+<ul>
+    <li>Integration with Spoonacular API for recipe data</li>
+    <li>Smart appliance detection based on recipe instructions</li>
+    <li>Recipe categorization by cooking method and equipment</li>
+    <li>Local caching system for improved performance</li>
+    <li>Dietary information tags</li>
+    <li>Random recipe selection</li>
+    <li>Detailed recipe views with ingredients and instructions</li>
+</ul>
+<h3 id="recipe-categories">Recipe Categories</h3>
+<p>Automatic categorization based on:</p>
+<ul>
+    <li>Required equipment</li>
+    <li>Cooking methods</li>
+    <li>Ingredient types</li>
+    <li>Dish types</li>
+    <li>Dietary restrictions</li>
+</ul>
+<h2 id="technical-implementation">Technical Implementation</h2>
+<h3 id="css-architecture">CSS Architecture</h3>
+<ul>
+    <li>Modular CSS organization</li>
+    <li>CSS custom properties (variables)</li>
+    <li>Efficient selectors</li>
+    <li>Optimized animations</li>
+    <li>Consistent naming conventions</li>
+    <li>Responsive layouts</li>
+    <li>Performance-optimized styles</li>
+</ul>
+<h3 id="javascript-features">JavaScript Features</h3>
+<ul>
+    <li>Client-side routing</li>
+    <li>State management</li>
+    <li>API integration</li>
+    <li>Local storage caching</li>
+    <li>Dynamic content rendering</li>
+    <li>Event delegation</li>
+    <li>Error handling</li>
+</ul>
+<h2 id="interactive-elements-implementation">
+    Interactive Elements Implementation
+</h2>
+<h3 id="hover-effects">Hover Effects</h3>
+<p>Each interactive element features:</p>
+<ul>
+    <li>Custom clip-path for precise interaction areas</li>
+    <li>Sparkle animations on hover</li>
+    <li>Smooth opacity transitions</li>
+    <li>Active state indicators</li>
+</ul>
+<h3 id="sparkle-animation">Sparkle Animation</h3>
+<ul>
+    <li>Dynamic positioning for each appliance</li>
+    <li>Gentle floating animation</li>
+    <li>Non-intrusive visual feedback</li>
+    <li>Pointer-events handling for smooth interaction</li>
+</ul>
+<h3 id="styling">Styling</h3>
+<p>The project uses a combination of:</p>
+<ul>
+    <li>Sprite sheets for efficient image loading</li>
+    <li>CSS animations for smooth transitions</li>
+    <li>Clip-path for precise interaction areas</li>
+    <li>Z-index management for proper layering</li>
+</ul>
+<h2 id="technology-stack">Technology Stack</h2>
+<ul>
+    <li>Vanilla JavaScript (ES6+)</li>
+    <li>CSS3 with animations</li>
+    <li>HTML5</li>
+    <li>Sprite sheets for optimized graphics</li>
+    <li>Custom router implementation</li>
+    <li>Spoonacular API integration</li>
+    <li>Local storage for caching</li>
+    <li>Environment variable management with Vite</li>
+</ul>
+<h2 id="performance">Performance</h2>
+<ul>
+    <li>
+        Lighthouse scores (Production):
+        <ul>
+            <li>Homepage: 86</li>
+            <li>Recipe Cards: 89</li>
+            <li>Recipe Details: 88</li>
+        </ul>
+    </li>
+    <li>Optimized asset loading</li>
+    <li>Efficient CSS organization</li>
+    <li>Smart caching strategies</li>
+    <li>Responsive image handling</li>
+</ul>

@@ -7,15 +7,15 @@ export const renderDietFilter = (recipes, onFilterChange) => {
     const filterContainer = document.createElement("div");
     filterContainer.className = "diet-filter";
 
-    filterContainer.innerHTML = `
+    const filterHTML = `
         <div class="diet-filter-tags">
             ${Object.entries(DIET_CATEGORIES)
         .map(
             ([key, value]) => `
-                <button class="diet-filter-tag ${value.className}" data-diet="${key}">
-                    ${value.display}
-                </button>
-            `
+                    <button class="diet-filter-tag ${value.className}" data-diet="${key}">
+                        ${value.display}
+                    </button>
+                `
         )
         .join("")}
         </div>
@@ -24,84 +24,68 @@ export const renderDietFilter = (recipes, onFilterChange) => {
         </div>
     `;
 
-    filterContainer.addEventListener("click", (e) => {
-        const rect = filterContainer.getBoundingClientRect();
-        const isClickingTab = e.clientX < rect.left + 40;
+    filterContainer.innerHTML = filterHTML;
 
-        if (isClickingTab) {
-            filterContainer.classList.toggle("active");
-        }
-    });
-
-    const savedFilters = JSON.parse(
-        localStorage.getItem(FILTER_STORAGE_KEY) || "[]"
-    );
-    const selectedDiets = new Set(savedFilters);
-
-    const buttons = filterContainer.querySelectorAll(".diet-filter-tag");
     const clearFiltersBtn = filterContainer.querySelector(".clear-filters-btn");
+    const buttons = filterContainer.querySelectorAll(".diet-filter-tag");
 
-    const updateClearButtonVisibility = () => {
+    const selectedDiets = new Set(
+        JSON.parse(localStorage.getItem(FILTER_STORAGE_KEY) || "[]")
+    );
+
+    const updateFilterState = () => {
         clearFiltersBtn.style.display =
             selectedDiets.size > 0 ? "block" : "none";
-    };
-
-    const saveFilters = () => {
         localStorage.setItem(
             FILTER_STORAGE_KEY,
             JSON.stringify(Array.from(selectedDiets))
         );
+
+        const filteredRecipes =
+            selectedDiets.size > 0
+                ? filterRecipesByDiet(recipes, Array.from(selectedDiets))
+                : recipes;
+
+        onFilterChange(filteredRecipes);
     };
 
-    const clearFilters = () => {
+    filterContainer.addEventListener("click", (e) => {
+        const rect = filterContainer.getBoundingClientRect();
+        if (e.clientX < rect.left + 40) {
+            filterContainer.classList.toggle("active");
+        }
+    });
+
+    filterContainer
+        .querySelector(".diet-filter-tags")
+        .addEventListener("click", (e) => {
+            if (!e.target.classList.contains("diet-filter-tag")) return;
+
+            const dietValue = e.target.dataset.diet;
+            if (selectedDiets.has(dietValue)) {
+                selectedDiets.delete(dietValue);
+                e.target.classList.remove("active");
+            } else {
+                selectedDiets.add(dietValue);
+                e.target.classList.add("active");
+            }
+
+            updateFilterState();
+        });
+
+    clearFiltersBtn.addEventListener("click", () => {
         selectedDiets.clear();
         buttons.forEach((button) => button.classList.remove("active"));
-        updateClearButtonVisibility();
-        saveFilters();
-        onFilterChange(recipes);
-    };
+        updateFilterState();
+    });
 
     buttons.forEach((button) => {
-        const dietValue = button.dataset.diet;
-        if (selectedDiets.has(dietValue)) {
+        if (selectedDiets.has(button.dataset.diet)) {
             button.classList.add("active");
         }
     });
-    updateClearButtonVisibility();
 
-    if (selectedDiets.size > 0) {
-        const filteredRecipes = filterRecipesByDiet(
-            recipes,
-            Array.from(selectedDiets)
-        );
-        onFilterChange(filteredRecipes);
-    }
-
-    buttons.forEach((button) => {
-        button.addEventListener("click", () => {
-            const dietValue = button.dataset.diet;
-
-            if (selectedDiets.has(dietValue)) {
-                selectedDiets.delete(dietValue);
-                button.classList.remove("active");
-            } else {
-                selectedDiets.add(dietValue);
-                button.classList.add("active");
-            }
-
-            updateClearButtonVisibility();
-            saveFilters();
-
-            const filteredRecipes =
-                selectedDiets.size > 0
-                    ? filterRecipesByDiet(recipes, Array.from(selectedDiets))
-                    : recipes;
-
-            onFilterChange(filteredRecipes);
-        });
-    });
-
-    clearFiltersBtn.addEventListener("click", clearFilters);
+    updateFilterState();
 
     return filterContainer;
 };

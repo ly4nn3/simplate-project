@@ -1,30 +1,45 @@
-// src/js/utils/bookUtils.js
+const ERROR_TEMPLATE = `
+    <div class="modal-content book-modal">
+        <button class="modal-close">&times;</button>
+        <div class="book-error">
+            <h2>No book recommendation available</h2>
+            <p>Please try again later.</p>
+        </div>
+    </div>
+`;
+
+const BOOK_DEFAULTS = {
+    id: 0,
+    title: "",
+    subtitle: "",
+    image: "",
+    genres: [],
+};
+
 export function processBook(book) {
     if (!book || typeof book !== "object") {
         throw new Error("Invalid book data");
     }
 
+    const { id, title, subtitle, image, genres } = book;
+
     return {
-        id: book.id || 0,
-        title: book.title || "",
-        subtitle: book.subtitle || "",
-        image: book.image || "",
-        genres: Array.isArray(book.genres) ? book.genres : [],
+        id: id || BOOK_DEFAULTS.id,
+        title: title || BOOK_DEFAULTS.title,
+        subtitle: subtitle || BOOK_DEFAULTS.subtitle,
+        image: image || BOOK_DEFAULTS.image,
+        genres: Array.isArray(genres) ? genres : BOOK_DEFAULTS.genres,
     };
 }
 
 export const renderBookModal = (book) => {
-    if (!book) {
-        return `
-            <div class="modal-content book-modal">
-                <button class="modal-close">&times;</button>
-                <div class="book-error">
-                    <h2>No book recommendation available</h2>
-                    <p>Please try again later.</p>
-                </div>
-            </div>
-        `;
-    }
+    if (!book) return ERROR_TEMPLATE;
+
+    const { title, subtitle, image, genres } = book;
+
+    const genresHTML = genres
+        .map((genre) => `<span class="genre-tag">${genre}</span>`)
+        .join("");
 
     return `
         <div class="modal-content book-modal">
@@ -32,18 +47,19 @@ export const renderBookModal = (book) => {
             <h2>Today's Book Recommendation</h2>
             <div class="book-content">
                 <div class="book-image">
-                    <img src="${book.image}" alt="${book.title}" width="250" height="auto">
+                    <img 
+                        src="${image}" 
+                        alt="${title}"
+                        width="250" 
+                        height="auto"
+                        loading="lazy"
+                    >
                 </div>
                 <div class="book-details">
-                    <h3>${book.title}</h3>
-                    ${book.subtitle ? `<p>${book.subtitle}</p>` : ""}
+                    <h3>${title}</h3>
+                    ${subtitle ? `<p>${subtitle}</p>` : ""}
                     <div class="book-genres">
-                        ${book.genres
-        .map(
-            (genre) =>
-                `<span class="genre-tag">${genre}</span>`
-        )
-        .join("")}
+                        ${genresHTML}
                     </div>
                 </div>
             </div>

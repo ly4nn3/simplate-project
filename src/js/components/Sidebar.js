@@ -1,40 +1,41 @@
 export const createSidebar = () => {
+    const LOADING_TEXT = "Loading recipes...";
+    const LOADED_TEXT = "Recipes loaded!";
+    const HOVER_TEXT = "Hover over appliances to see their total recipes.";
+    const DEFAULT_TOOLTIP = "Hover over appliances to see total recipes";
+
     const sidebar = document.createElement("div");
     sidebar.className = "kitchen-sidebar";
 
-    const initialContent = `
-        <div class="sidebar-content">
-            <h2>Welcome to Simplate</h2>
-            <div class="status-text">Loading recipes...</div>
-            <div class="">Filter recipes with the Dietary Preferences tab.</div>
-            <div class="tooltip-content"></div>
-        </div>
-    `;
+    const content = document.createElement("div");
+    content.className = "sidebar-content";
 
-    sidebar.innerHTML = initialContent;
+    const title = document.createElement("h2");
+    title.textContent = "Welcome to Simplate";
+
+    const statusText = document.createElement("div");
+    statusText.className = "status-text";
+    statusText.textContent = LOADING_TEXT;
+
+    const filterText = document.createElement("div");
+    filterText.textContent = "Filter recipes with the Dietary Preferences tab.";
+
+    const tooltipContent = document.createElement("div");
+    tooltipContent.className = "tooltip-content";
+
+    content.append(title, statusText, filterText, tooltipContent);
+    sidebar.appendChild(content);
 
     const setLoadingComplete = () => {
         setTimeout(() => {
-            const statusText = sidebar.querySelector(".status-text");
-            const tooltipContent = sidebar.querySelector(".tooltip-content");
-
-            if (statusText) {
-                statusText.textContent = "Recipes loaded!";
-            }
-            if (tooltipContent) {
-                tooltipContent.textContent =
-                    "Hover over appliances to see their total recipes.";
-            }
+            statusText.textContent = LOADED_TEXT;
+            tooltipContent.textContent = HOVER_TEXT;
         }, 500);
     };
 
     const updateTooltip = (applianceType, recipeCount) => {
-        const tooltipContent = sidebar.querySelector(".tooltip-content");
-        if (!tooltipContent) return;
-
         if (!applianceType) {
-            tooltipContent.textContent =
-                "Hover over appliances to see total recipes";
+            tooltipContent.textContent = DEFAULT_TOOLTIP;
             return;
         }
 

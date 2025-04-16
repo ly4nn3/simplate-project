@@ -2,38 +2,48 @@ import { RefreshCountdown } from "./RefreshCountdown.js";
 import { CACHE_DURATION } from "../constants/apiConfig.js";
 
 export class Header {
+    #element;
+    #recipeCountdown;
+    #bookCountdown;
+
     constructor() {
-        this.element = document.querySelector("header");
-        this.initializeHeader();
+        this.#element = document.querySelector("header");
+        this.#initializeHeader();
     }
 
-    initializeHeader() {
-        const leftSection = document.createElement("div");
-        leftSection.classList.add("header-left");
-        leftSection.innerHTML = this.element.innerHTML;
+    #initializeHeader() {
+        const headerContent = `
+            <div class="header-left">
+                ${this.#element.innerHTML}
+            </div>
+            <div class="header-right"></div>
+        `;
 
-        const rightSection = document.createElement("div");
-        rightSection.classList.add("header-right");
+        this.#element.innerHTML = headerContent;
 
-        this.recipeCountdown = new RefreshCountdown(
+        const rightSection = this.#element.querySelector(".header-right");
+
+        this.#recipeCountdown = new RefreshCountdown(
             "recipes",
             CACHE_DURATION.RECIPES
         );
-        this.bookCountdown = new RefreshCountdown(
+        this.#bookCountdown = new RefreshCountdown(
             "books",
             CACHE_DURATION.BOOKS
         );
 
-        rightSection.appendChild(this.recipeCountdown.element);
-        rightSection.appendChild(this.bookCountdown.element);
-
-        this.element.innerHTML = "";
-        this.element.appendChild(leftSection);
-        this.element.appendChild(rightSection);
+        rightSection.append(
+            this.#recipeCountdown.element,
+            this.#bookCountdown.element
+        );
     }
 
     destroy() {
-        if (this.recipeCountdown) this.recipeCountdown.destroy();
-        if (this.bookCountdown) this.bookCountdown.destroy();
+        [this.#recipeCountdown, this.#bookCountdown].forEach((countdown) => {
+            if (countdown) countdown.destroy();
+        });
+
+        this.#recipeCountdown = null;
+        this.#bookCountdown = null;
     }
 }
