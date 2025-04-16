@@ -1,6 +1,16 @@
-@media (min-width: 884px) {
-    .sparkle {
-        font-size: 16px;
+@media (max-width: 1300px) {
+    .kitchen-sidebar {
+        transform: translateY(-50%) translateX(-100%);
+    }
+}
+
+@media (max-width: 884px) {
+    .offline-indicator span {
+        display: none;
+    }
+
+    .offline-indicator::before {
+        content: "❌ Offline - Can browse until refresh";
     }
 }
 
