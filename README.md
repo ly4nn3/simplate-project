@@ -2,8 +2,8 @@
 
 A recipe hub website built with vanilla JavaScript, featuring an interactive kitchen interface where users can explore recipes based on different cooking appliances. The project uses modern web technologies and a sprite-based approach for smooth interactions.
 
-![Simplate Logo Black](src/assets/images/logo-black.svg)
-![Simplate Logo White](src/assets/images/logo-white.svg)
+![Simplate Logo Black](src/public/assets/images/logo-black.svg)
+![Simplate Logo White](src/public/assets/images/logo-white.svg)
 
 ## Development Setup
 1. Clone the repository:
