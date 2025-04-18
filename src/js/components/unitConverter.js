@@ -1,4 +1,3 @@
-// TODO: Weekly check to update more values
 const CONVERSIONS = {
     volume: {
         cup: { metric: 240, unit: "ml" },
