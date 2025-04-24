@@ -1,4 +1,5 @@
 import { DIET_CATEGORIES } from "../../data/diet-categories.js";
+import { COOKING_PRIORITY } from "../../data/categories/cooking.js";
 import {
     categorizeEquipment,
     identifyPrimaryEquipment,
@@ -125,27 +126,27 @@ export function getAllDiets(recipe) {
 export function categorizeRecipesByEquipment(recipes) {
     if (!Array.isArray(recipes)) return {};
 
-    return recipes.reduce(
-        (categories, recipe) => {
-            const category = recipe.equipment.primary
-                ? recipe.equipment.primary
-                : recipe.equipment.hasSpecializedEquipment
-                    ? "specialized"
-                    : "basic";
+    const categories = COOKING_PRIORITY.reduce((acc, category) => {
+        acc[category] = [];
+        return acc;
+    }, {
+        specialized: [],
+        basic: []
+    });
 
-            categories[category] = [...(categories[category] || []), recipe];
-            return categories;
-        },
-        {
-            stove: [],
-            oven: [],
-            microwave: [],
-            board: [],
-            ricecooker: [],
-            specialized: [],
-            basic: [],
+    recipes.forEach(recipe => {
+        const category = recipe.equipment.primary
+            ? recipe.equipment.primary
+            : recipe.equipment.hasSpecializedEquipment
+                ? "specialized"
+                : "basic";
+
+        if (category in categories) {
+            categories[category].push(recipe);
         }
-    );
+    });
+
+    return categories;
 }
 
 // Recipe randomizer
