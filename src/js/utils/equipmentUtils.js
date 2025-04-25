@@ -37,7 +37,7 @@ export function categorizeEquipment(equipmentList) {
         let foundInAssets = false;
 
         // asset categories
-        for (const [data] of Object.entries(KITCHEN_ASSETS.equipment)) {
+        for (const [, data] of Object.entries(KITCHEN_ASSETS.equipment)) {
             if (data.equipment.includes(equipment)) {
                 categorized.display.push(equipment);
                 foundInAssets = true;
