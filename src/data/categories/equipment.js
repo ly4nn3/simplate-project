@@ -16,3 +16,29 @@ export const EQUIPMENT_CATEGORIES = {
         "meat grinder", "pizza stone", "grill",
     ]
 };
+
+export const COOKING_COMBOS = {
+    "stove+oven": ["stove", "oven"],
+    "oven+stove": ["oven", "stove"],
+
+    "stove+board": ["stove", "board"],
+    "oven+board": ["oven", "board"],
+};
+
+export const COMBO_INDICATORS = {
+    "stove+oven": [
+        "transfer to oven",
+        "place in oven",
+        "move to oven",
+        "pour into baking",
+        "bake for",
+        "into a baking",
+    ],
+
+    "oven+stove": [
+        "sauté", 
+        "saute", 
+        "heat a pan",
+        "on the stove",
+    ]
+}

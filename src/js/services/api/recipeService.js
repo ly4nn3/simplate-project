@@ -11,8 +11,13 @@ export async function getRecipesByAppliance(applianceType) {
 
             if (applianceType) {
                 return processedRecipes.filter(
-                    (recipe) =>
-                        recipe.equipment.primary === applianceType.toLowerCase()
+                    (recipe) => {
+                        if (recipe.equipment.primary && recipe.equipment.primary.includes('+')) {
+                            return recipe.equipment.primary.split('+').includes(applianceType.toLowerCase());
+                        }
+                        
+                        return recipe.equipment.primary === applianceType.toLowerCase();
+                    }
                 );
             }
             return processedRecipes;

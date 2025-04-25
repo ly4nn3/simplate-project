@@ -1,5 +1,5 @@
 import { KITCHEN_ASSETS } from "../../data/kitchen/assets.js";
-import { COOKING_CATEGORIES, COOKING_PRIORITY } from "../../data/categories/cooking.js";
+import { COOKING_CATEGORIES, COOKING_PRIORITY, COOKING_COMBOS, COMBO_INDICATORS } from "../../data/categories/cooking.js";
 import { EQUIPMENT_CATEGORIES } from "../../data/categories/equipment.js";
 
 export function categorizeEquipment(equipmentList) {
@@ -61,7 +61,32 @@ export function identifyPrimaryEquipment(recipe) {
     if (!recipe?.analyzedInstructions?.[0]?.steps) return null;
 
     const steps = recipe.analyzedInstructions[0].steps;
-
+    const fullInstructions = steps.map(step => step.step.toLowerCase()).join(" ");
+    
+    for (const [comboName, indicators] of Object.entries(COMBO_INDICATORS)) {
+        if (indicators.some(phrase => fullInstructions.includes(phrase.toLowerCase()))) {
+            return comboName;
+        }
+    }
+    
+    const detectedCategories = [];
+    
+    for (const category of COOKING_PRIORITY) {
+        if (COOKING_CATEGORIES[category]?.methods.some(method => 
+            fullInstructions.includes(method.toLowerCase())
+        )) {
+            detectedCategories.push(category);
+        }
+    }
+    
+    if (detectedCategories.length > 1) {
+        for (const [comboName, categories] of Object.entries(COOKING_COMBOS)) {
+            if (categories.every(cat => detectedCategories.includes(cat))) {
+                return comboName;
+            }
+        }
+    }
+    
     return (
         checkIngredientBasedCategory(recipe) ||
         checkCookingMethod(steps) ||

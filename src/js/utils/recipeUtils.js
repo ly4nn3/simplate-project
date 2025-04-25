@@ -234,18 +234,16 @@ export const renderEquipmentTags = (recipe) => {
     const tags = [];
 
     if (recipe.equipment.primary) {
-        tags.push(
-            `<span class="equipment-tag primary">${recipe.equipment.primary}</span>`
-        );
+        if (recipe.equipment.primary.includes('+')) {
+            const categories = recipe.equipment.primary.split('+');
+            categories.forEach((category) => {
+                tags.push(`<span class="equipment-tag primary">${category}</span>`);
+            });
+        } else {
+            tags.push(`<span class="equipment-tag primary">${recipe.equipment.primary}</span>`);
+        }
     }
 
-    if (Array.isArray(recipe.equipment.display)) {
-        tags.push(
-            ...recipe.equipment.display
-                .filter((item) => item !== recipe.equipment.primary)
-                .map((item) => `<span class="equipment-tag">${item}</span>`)
-        );
-    }
 
     if (Array.isArray(recipe.equipment.specialized)) {
         tags.push(
