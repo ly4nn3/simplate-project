@@ -10,10 +10,20 @@ export async function getRecipesByAppliance(applianceType) {
             const processedRecipes = cachedResponse.recipes.map(processRecipe);
 
             if (applianceType) {
-                return processedRecipes.filter(
-                    (recipe) =>
+                return processedRecipes.filter((recipe) => {
+                    if (
+                        recipe.equipment.primary &&
+                        recipe.equipment.primary.includes("+")
+                    ) {
+                        return recipe.equipment.primary
+                            .split("+")
+                            .includes(applianceType.toLowerCase());
+                    }
+
+                    return (
                         recipe.equipment.primary === applianceType.toLowerCase()
-                );
+                    );
+                });
             }
             return processedRecipes;
         }

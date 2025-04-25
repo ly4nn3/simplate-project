@@ -4,11 +4,11 @@ import { filterRecipesByDiet } from "../utils/recipeUtils.js";
 const FILTER_STORAGE_KEY = "selected_diet_filters";
 
 export const renderDietFilter = (recipes, onFilterChange) => {
-    const existingFilter = document.querySelector('.diet-filter');
+    const existingFilter = document.querySelector(".diet-filter");
     if (existingFilter) {
         existingFilter.remove();
     }
-    
+
     const filterContainer = document.createElement("div");
     filterContainer.className = "diet-filter";
 
