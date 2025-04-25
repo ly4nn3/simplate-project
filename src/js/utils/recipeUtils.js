@@ -126,15 +126,18 @@ export function getAllDiets(recipe) {
 export function categorizeRecipesByEquipment(recipes) {
     if (!Array.isArray(recipes)) return {};
 
-    const categories = COOKING_PRIORITY.reduce((acc, category) => {
-        acc[category] = [];
-        return acc;
-    }, {
-        specialized: [],
-        basic: []
-    });
+    const categories = COOKING_PRIORITY.reduce(
+        (acc, category) => {
+            acc[category] = [];
+            return acc;
+        },
+        {
+            specialized: [],
+            basic: [],
+        }
+    );
 
-    recipes.forEach(recipe => {
+    recipes.forEach((recipe) => {
         const category = recipe.equipment.primary
             ? recipe.equipment.primary
             : recipe.equipment.hasSpecializedEquipment
@@ -234,16 +237,19 @@ export const renderEquipmentTags = (recipe) => {
     const tags = [];
 
     if (recipe.equipment.primary) {
-        if (recipe.equipment.primary.includes('+')) {
-            const categories = recipe.equipment.primary.split('+');
+        if (recipe.equipment.primary.includes("+")) {
+            const categories = recipe.equipment.primary.split("+");
             categories.forEach((category) => {
-                tags.push(`<span class="equipment-tag primary">${category}</span>`);
+                tags.push(
+                    `<span class="equipment-tag primary">${category}</span>`
+                );
             });
         } else {
-            tags.push(`<span class="equipment-tag primary">${recipe.equipment.primary}</span>`);
+            tags.push(
+                `<span class="equipment-tag primary">${recipe.equipment.primary}</span>`
+            );
         }
     }
-
 
     if (Array.isArray(recipe.equipment.specialized)) {
         tags.push(

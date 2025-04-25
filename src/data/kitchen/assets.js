@@ -19,7 +19,7 @@ export const KITCHEN_ASSETS = {
                 "dutch oven",
                 "skillet",
             ],
-            selector: ".stove-active"
+            selector: ".stove-active",
         },
         oven: {
             equipment: [
@@ -28,19 +28,19 @@ export const KITCHEN_ASSETS = {
                 "casserole dish",
                 "roasting pan",
             ],
-            selector: ".oven-active"
+            selector: ".oven-active",
         },
         microwave: {
             equipment: ["microwave-safe dish", "microwave plate"],
-            selector: ".microwave-active"
+            selector: ".microwave-active",
         },
         board: {
             equipment: ["cutting board", "chopping board"],
-            selector: ".board-active"
+            selector: ".board-active",
         },
         ricecooker: {
             equipment: ["rice cooker"],
-            selector: ".ricecooker-active"
-        }
-    }
+            selector: ".ricecooker-active",
+        },
+    },
 };
