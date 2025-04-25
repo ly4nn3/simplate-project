@@ -139,6 +139,13 @@ footer a {
     text-underline-offset: 5px;
 }
 
+footer .version {
+    font-size: 0.75rem;
+    opacity: 0.8;
+    display: inline-block;
+    margin-left: 0.25rem;
+}
+
 /* Common card styles */
 .recipe-card,
 .recipe-details-content,
