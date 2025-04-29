@@ -161,7 +161,15 @@ const handleRecipeDetailView = async (recipeId, applianceType) => {
             return ERROR_TEMPLATE("Recipe not found", applianceType);
         }
 
-        const effectiveType = recipe.equipment?.primary || applianceType;
+        let effectiveType = recipe.equipment?.primary || applianceType;
+        if (effectiveType && effectiveType.includes('+')) {
+            if (applianceType && effectiveType.includes(applianceType)) {
+                effectiveType = applianceType;
+            } else {
+                effectiveType = effectiveType.split('+')[0];
+            }
+        }
+
         const capitalizedType = capitalizeFirst(effectiveType);
 
         const html = `
